@@ -18,6 +18,8 @@
             background-color: #0f172a;
             color: #f8fafc;
             touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         canvas {
             display: block;
@@ -39,7 +41,7 @@
 <body class="relative select-none">
 
     <!-- LOBBY SCREEN -->
-    <div id="lobby-screen" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 overflow-y-auto">
+    <div id="lobby-screen" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-md p-4 overflow-y-auto">
         <div class="max-w-4xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col gap-6 my-auto">
             
             <!-- Header -->
@@ -48,7 +50,7 @@
                     <h1 class="text-3xl font-black bg-gradient-to-r from-amber-400 via-rose-500 to-indigo-500 bg-clip-text text-transparent">
                         3D 총기 가챠 숨바꼭질
                     </h1>
-                    <p class="text-xs text-slate-400 mt-1">모바일 & PC 완벽 지원! 벽 통과 누브와 1인 술래 감염모드!</p>
+                    <p class="text-xs text-slate-400 mt-1">모바일 조이스틱 & PC 완벽 지원! 1명 술래 감염모드 & 벽 통과 누브!</p>
                 </div>
                 <div class="flex items-center gap-4 bg-slate-800/80 px-4 py-2 rounded-2xl border border-slate-700">
                     <i class="fa-solid fa-coins text-amber-400 text-xl"></i>
@@ -63,11 +65,11 @@
                 <div class="flex flex-col gap-4">
                     <!-- Map Selection -->
                     <div class="flex flex-col gap-2">
-                        <label class="text-xs font-bold text-slate-300"><i class="fa-solid fa-map text-indigo-400 mr-2"></i>맵 선택</label>
+                        <label class="text-xs font-bold text-slate-300"><i class="fa-solid fa-map text-indigo-400 mr-2"></i>맵 선택 (용암 동굴은 딱 3칸의 용암 함정)</label>
                         <div class="grid grid-cols-3 gap-2">
-                            <button onclick="selectMap('backrooms')" id="map-btn-backrooms" class="map-btn py-2 px-3 rounded-xl border border-indigo-500 bg-indigo-600/30 text-xs font-bold transition hover:bg-indigo-600/50">백룸</button>
-                            <button onclick="selectMap('factory')" id="map-btn-factory" class="map-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold transition hover:bg-slate-700">용암 동굴 (3칸)</button>
-                            <button onclick="selectMap('city')" id="map-btn-city" class="map-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold transition hover:bg-slate-700">사이버 도시</button>
+                            <button onclick="selectMap('backrooms')" id="map-btn-backrooms" class="map-btn py-2 px-3 rounded-xl border border-indigo-500 bg-indigo-600/30 text-xs font-bold transition">백룸</button>
+                            <button onclick="selectMap('factory')" id="map-btn-factory" class="map-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold transition">용암 동굴 (3칸)</button>
+                            <button onclick="selectMap('city')" id="map-btn-city" class="map-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold transition">사이버 도시</button>
                         </div>
                     </div>
 
@@ -75,16 +77,16 @@
                     <div class="flex flex-col gap-2">
                         <label class="text-xs font-bold text-slate-300"><i class="fa-solid fa-expand text-emerald-400 mr-2"></i>맵 크기 (거대 사이즈 포함)</label>
                         <div class="grid grid-cols-4 gap-2">
-                            <button onclick="selectSize('small')" id="size-btn-small" class="size-btn py-2 px-2 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold">보통</button>
+                            <button onclick="selectSize('small')" id="size-btn-small" class="size-btn py-2 px-2 rounded-xl border border-emerald-500 bg-emerald-600/30 text-xs font-bold">보통</button>
                             <button onclick="selectSize('large')" id="size-btn-large" class="size-btn py-2 px-2 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold">매우 큼</button>
-                            <button onclick="selectSize('huge')" id="size-btn-huge" class="size-btn py-2 px-2 rounded-xl border border-emerald-500 bg-emerald-600/30 text-xs font-bold">초거대 미로</button>
+                            <button onclick="selectSize('huge')" id="size-btn-huge" class="size-btn py-2 px-2 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold">초거대 미로</button>
                             <button onclick="selectSize('massive')" id="size-btn-massive" class="size-btn py-2 px-2 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold">엄청난 거대</button>
                         </div>
                     </div>
 
                     <!-- Infection Mode Toggle -->
                     <div class="flex flex-col gap-2">
-                        <label class="text-xs font-bold text-slate-300"><i class="fa-solid fa-virus text-rose-400 mr-2"></i>게임 모드 (술래는 항상 1명 시작)</label>
+                        <label class="text-xs font-bold text-slate-300"><i class="fa-solid fa-virus text-rose-400 mr-2"></i>게임 모드 (술래는 항상 1명)</label>
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="selectInfectionMode(true)" id="inf-btn-yes" class="inf-btn py-2 px-3 rounded-xl border border-rose-500 bg-rose-600/30 text-xs font-bold">감염모드 (잡히면 술래)</button>
                             <button onclick="selectInfectionMode(false)" id="inf-btn-no" class="inf-btn py-2 px-3 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold">감염모드 X (잡히면 탈락)</button>
@@ -108,7 +110,7 @@
                             <span><i class="fa-solid fa-person-running text-cyan-400 mr-2"></i>내 이동 속도 조절</span>
                             <span id="speed-slider-val" class="text-cyan-400 font-extrabold">1.2x</span>
                         </div>
-                        <input type="range" id="custom-speed-slider" min="0.8" max="2.5" step="0.1" value="1.2" class="w-full accent-cyan-500 cursor-pointer">
+                        <input type="range" id="custom-speed-slider" min="0.8" max="2.5" step="0.1" value="1.2" class="w-full accent-cyan-500 cursor-pointer" oninput="document.getElementById('speed-slider-val').innerText = this.value + 'x'">
                     </div>
                 </div>
 
@@ -163,7 +165,7 @@
     <!-- IN-GAME HUD -->
     <div id="game-hud" class="absolute inset-0 pointer-events-none hidden z-30 flex flex-col justify-between p-4">
         <!-- Top Bar -->
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center pointer-events-auto">
             <div class="bg-slate-900/80 border border-slate-700 px-4 py-2 rounded-2xl backdrop-blur flex items-center gap-4">
                 <div>
                     <div class="text-[10px] text-slate-400">남은 시간</div>
@@ -181,7 +183,7 @@
                     <div class="text-[10px] text-slate-400">생존 / 술래</div>
                     <div id="hud-stats" class="font-black text-sm text-rose-400">도망자 27명 / 술래 1명</div>
                 </div>
-                <button onclick="returnToLobby()" class="pointer-events-auto bg-rose-600/80 hover:bg-rose-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition">
+                <button onclick="returnToLobby()" class="bg-rose-600/80 hover:bg-rose-600 text-white px-3 py-1.5 rounded-xl font-bold text-xs transition">
                     나가기
                 </button>
             </div>
@@ -195,14 +197,14 @@
         <!-- MOBILE TOUCH CONTROLS OVERLAY -->
         <div id="mobile-controls" class="absolute inset-0 pointer-events-none flex justify-between items-end p-6 z-30 select-none">
             <!-- Left: Virtual Joystick Area -->
-            <div id="touch-joystick-area" class="pointer-events-auto w-36 h-36 rounded-full bg-slate-800/40 border border-slate-600/50 backdrop-blur relative flex items-center justify-center touch-none">
-                <div id="touch-joystick-thumb" class="w-14 h-14 rounded-full bg-indigo-500/80 border border-indigo-300 shadow-lg absolute"></div>
-                <div class="absolute bottom-1 text-[10px] text-slate-300 font-bold pointer-events-none">이동 조이스틱</div>
+            <div id="touch-joystick-area" class="pointer-events-auto w-40 h-40 rounded-full bg-slate-800/50 border-2 border-slate-600/80 backdrop-blur relative flex items-center justify-center touch-none">
+                <div id="touch-joystick-thumb" class="w-16 h-16 rounded-full bg-indigo-500/90 border-2 border-indigo-200 shadow-xl absolute transition-transform duration-75"></div>
+                <div class="absolute bottom-2 text-[10px] text-slate-300 font-extrabold pointer-events-none">이동 조이스틱</div>
             </div>
 
-            <!-- Right: Action Buttons (Shoot, Camouflage, Jump/Dash) -->
-            <div class="pointer-events-auto flex flex-col gap-3">
-                <button id="btn-touch-camouflage" class="w-16 h-16 rounded-2xl bg-emerald-600/80 border border-emerald-400 text-white font-bold text-xs flex flex-col items-center justify-center shadow-xl active:scale-95 touch-none">
+            <!-- Right: Action Buttons (Shoot, Camouflage) -->
+            <div class="pointer-events-auto flex flex-col gap-4 mb-4">
+                <button id="btn-touch-camouflage" class="w-16 h-16 rounded-2xl bg-emerald-600/90 border-2 border-emerald-400 text-white font-bold text-xs flex flex-col items-center justify-center shadow-2xl active:scale-95 touch-none">
                     <i class="fa-solid fa-shirt text-lg"></i>
                     <span>위장(E)</span>
                 </button>
@@ -221,13 +223,13 @@
                 </div>
                 <div>
                     <div id="hud-gun-name" class="font-extrabold text-amber-300 text-xs">기본 피스톨</div>
-                    <div class="text-[10px] text-slate-400">발사: 좌클릭 또는 우측 발사 버튼</div>
+                    <div class="text-[10px] text-slate-400">좌측 조이스틱 이동 / 우측 드래그 시점</div>
                 </div>
             </div>
 
-            <div class="bg-slate-900/80 border border-slate-700 px-4 py-2 rounded-2xl backdrop-blur text-right">
+            <div class="bg-slate-900/80 border border-slate-700 px-4 py-2 rounded-2xl backdrop-blur text-right hidden md:block">
                 <div class="text-[10px] text-slate-400">조작 가이드</div>
-                <div class="text-xs font-bold text-indigo-400">WASD 이동 / 마우스/터치 시점 / E 위장</div>
+                <div class="text-xs font-bold text-indigo-400">WASD 이동 / 마우스 시점 / E 위장</div>
             </div>
         </div>
     </div>
@@ -266,7 +268,7 @@
         const keyState = {};
         const mouseLook = { x: 0, y: 0 };
 
-        // Mobile touch control state
+        // Robust mobile touch control state
         const touchState = {
             joystickActive: false,
             joystickTouchId: null,
@@ -278,7 +280,7 @@
 
         const gameState = {
             coins: 1000,
-            infectionMode: true, // true: 감염모드 (잡히면 술래), false: 감염모드X (잡히면 탈락)
+            infectionMode: true,
             selectedMap: 'backrooms',
             mapSize: 'small',
             mapLimit: 20,
@@ -305,35 +307,45 @@
         const SoundFX = {
             ctx: null,
             init() {
-                if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (!this.ctx) {
+                    try {
+                        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    } catch (e) {
+                        console.warn("Web Audio API not supported", e);
+                    }
+                }
             },
             playShoot() {
                 if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(400, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.15);
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.15);
+                } catch(e) {}
             },
             playTag() {
                 if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.3);
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.3);
+                } catch(e) {}
             }
         };
 
@@ -353,9 +365,9 @@
         function selectSize(size) {
             gameState.mapSize = size;
             if (size === 'small') gameState.mapLimit = 20;
-            else if (size === 'large') gameState.mapLimit = 40;
-            else if (size === 'huge') gameState.mapLimit = 70;
-            else if (size === 'massive') gameState.mapLimit = 110;
+            else if (size === 'large') gameState.mapLimit = 45;
+            else if (size === 'huge') gameState.mapLimit = 80;
+            else if (size === 'massive') gameState.mapLimit = 130;
 
             document.querySelectorAll('.size-btn').forEach(btn => {
                 btn.classList.remove('border-emerald-500', 'bg-emerald-600/30');
@@ -401,7 +413,7 @@
 
         function rollGacha() {
             if (gameState.coins < 300) {
-                alert("골드가 부족합니다!");
+                showCustomMessage("골드가 부족합니다!");
                 return;
             }
             gameState.coins -= 300;
@@ -428,7 +440,7 @@
         function upgradeStat(statType) {
             const cost = 200;
             if (gameState.coins < cost) {
-                alert("골드가 부족합니다!");
+                showCustomMessage("골드가 부족합니다!");
                 return;
             }
             gameState.coins -= cost;
@@ -446,21 +458,31 @@
             }
         }
 
+        function showCustomMessage(msg) {
+            const div = document.createElement('div');
+            div.className = 'absolute top-10 left-1/2 -translate-x-1/2 z-50 bg-slate-900 border border-amber-500 text-amber-300 px-6 py-3 rounded-2xl shadow-2xl font-black text-sm animate-bounce';
+            div.innerText = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 2500);
+        }
+
         function returnToLobby() {
             gameState.inGame = false;
             document.getElementById('game-hud').classList.add('hidden');
             document.getElementById('lobby-screen').classList.remove('hidden');
-            if (document.exitPointerLock) document.exitPointerLock();
+            if (document.exitPointerLock) {
+                document.exitPointerLock().catch(() => {});
+            }
         }
 
         function initThree() {
             const container = document.getElementById('canvas-container');
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x0b0f19);
-            scene.fog = new THREE.FogExp2(0x0b0f19, 0.025);
+            scene.fog = new THREE.FogExp2(0x0b0f19, 0.02);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
             container.appendChild(renderer.domElement);
@@ -486,7 +508,6 @@
         }
 
         function generateMap(mapType) {
-            // Remove old map objects
             mapObjects.forEach(obj => scene.remove(obj));
             mapObjects = [];
             lavaAbysses = [];
@@ -510,7 +531,7 @@
             const ceilMat = new THREE.MeshStandardMaterial({ color: 0x111827 });
             const ceiling = new THREE.Mesh(ceilGeo, ceilMat);
             ceiling.rotation.x = Math.PI / 2;
-            ceiling.position.y = 10;
+            ceiling.position.y = 12;
             scene.add(ceiling);
             mapObjects.push(ceiling);
 
@@ -538,17 +559,17 @@
                 roughness: 0.5 
             });
 
-            const wallCount = Math.floor(limit * 1.2);
+            const wallCount = Math.floor(limit * 1.3);
             for (let i = 0; i < wallCount; i++) {
-                const w = Math.random() * 4 + 3;
-                const h = 10;
-                const d = Math.random() * 4 + 3;
+                const w = Math.random() * 5 + 3;
+                const h = 12;
+                const d = Math.random() * 5 + 3;
                 const wallGeo = new THREE.BoxGeometry(w, h, d);
                 const wall = new THREE.Mesh(wallGeo, wallMat);
 
                 const x = (Math.random() - 0.5) * (limit * 1.8);
                 const z = (Math.random() - 0.5) * (limit * 1.8);
-                if (Math.abs(x) < 6 && Math.abs(z) < 6) continue; // Keep spawn clear
+                if (Math.abs(x) < 8 && Math.abs(z) < 8) continue; // Keep spawn clear
 
                 wall.position.set(x, h / 2, z);
                 wall.castShadow = true;
@@ -574,8 +595,8 @@
 
             p1 = {
                 mesh: pGroup,
-                role: 'runner', // always starts as runner
-                speed: 8.0,
+                role: 'runner',
+                speed: 8.5,
                 health: 100,
                 isCamouflaged: false
             };
@@ -584,10 +605,10 @@
             const totalBots = 27;
             for (let i = 0; i < totalBots; i++) {
                 const botGroup = new THREE.Group();
-                const isSeeker = (i === 0); // Exactly 1 Seeker at start
+                const isSeeker = (i === 0);
 
                 const bMat = new THREE.MeshStandardMaterial({ 
-                    color: isSeeker ? 0xf43f5e : 0x22c55e, // Red for Seeker, Green for Noob Runner
+                    color: isSeeker ? 0xf43f5e : 0x22c55e,
                     roughness: 0.3 
                 });
                 const bMesh = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.4, 0.6), bMat);
@@ -595,7 +616,7 @@
                 botGroup.add(bMesh);
 
                 const angle = Math.random() * Math.PI * 2;
-                const dist = Math.random() * (gameState.mapLimit * 0.7) + 5;
+                const dist = Math.random() * (gameState.mapLimit * 0.7) + 6;
                 botGroup.position.set(Math.cos(angle) * dist, 0, Math.sin(angle) * dist);
 
                 scene.add(botGroup);
@@ -603,9 +624,10 @@
                 entities.push({
                     mesh: botGroup,
                     isSeeker: isSeeker,
-                    speed: isSeeker ? 7.2 : 6.5,
-                    passThroughWalls: true, // Hiding noobs pass through walls!
-                    wanderTimer: Math.random() * 3
+                    speed: isSeeker ? 7.5 : 6.8,
+                    passThroughWalls: true,
+                    wanderTimer: Math.random() * 3,
+                    dodgeAngle: Math.random() * Math.PI * 2
                 });
             }
         }
@@ -624,8 +646,9 @@
 
             document.addEventListener('mousemove', (e) => {
                 if (!gameState.inGame) return;
-                if (document.pointerLockElement === document.getElementById('canvas-container') || document.pointerLockElement === document.body || window.innerWidth <= 1024) {
-                    const sensitivity = 0.002;
+                // Only use mouse look on PC if pointer is locked or width is desktop size
+                if (document.pointerLockElement === document.getElementById('canvas-container') || document.pointerLockElement === document.body || window.innerWidth > 1024) {
+                    const sensitivity = 0.0022;
                     mouseLook.x -= e.movementX * sensitivity;
                     mouseLook.y -= e.movementY * sensitivity;
 
@@ -635,52 +658,57 @@
             });
 
             window.addEventListener('mousedown', (e) => {
-                if (gameState.inGame && e.button === 0) {
+                if (gameState.inGame && e.button === 0 && e.clientX < window.innerWidth - 150) {
                     shootWeapon();
                 }
             });
 
-            // MOBILE TOUCH CONTROLS SETUP
+            // ROBUST MOBILE TOUCH CONTROLS SETUP
             const joystickArea = document.getElementById('touch-joystick-area');
             const joystickThumb = document.getElementById('touch-joystick-thumb');
 
-            joystickArea.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                const touch = e.targetTouches[0];
-                touchState.joystickTouchId = touch.identifier;
-                const rect = joystickArea.getBoundingClientRect();
-                touchState.joystickCenter = {
-                    x: rect.left + rect.width / 2,
-                    y: rect.top + rect.height / 2
-                };
-                touchState.joystickActive = true;
-            }, { passive: false });
+            if (joystickArea) {
+                joystickArea.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (touchState.joystickActive) return;
+                    const touch = e.targetTouches[0];
+                    touchState.joystickTouchId = touch.identifier;
+                    const rect = joystickArea.getBoundingClientRect();
+                    touchState.joystickCenter = {
+                        x: rect.left + rect.width / 2,
+                        y: rect.top + rect.height / 2
+                    };
+                    touchState.joystickActive = true;
+                }, { passive: false });
+            }
 
             window.addEventListener('touchmove', (e) => {
                 if (!gameState.inGame) return;
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    const touch = e.changedTouches[i];
+                for (let i = 0; i < e.targetTouches.length; i++) {
+                    const touch = e.targetTouches[i];
                     
                     // Handle Joystick movement
                     if (touchState.joystickActive && touch.identifier === touchState.joystickTouchId) {
                         const dx = touch.clientX - touchState.joystickCenter.x;
                         const dy = touch.clientY - touchState.joystickCenter.y;
                         const dist = Math.sqrt(dx * dx + dy * dy);
-                        const maxDist = 45;
+                        const maxDist = 55;
 
                         const clampedDist = Math.min(dist, maxDist);
                         const angle = Math.atan2(dy, dx);
 
                         const thumbX = Math.cos(angle) * clampedDist;
                         const thumbY = Math.sin(angle) * clampedDist;
-                        joystickThumb.style.transform = `translate(${thumbX}px, ${thumbY}px)`;
+                        if (joystickThumb) {
+                            joystickThumb.style.transform = `translate(${thumbX}px, ${thumbY}px)`;
+                        }
 
                         touchState.joystickVector.x = (thumbX / maxDist);
                         touchState.joystickVector.z = (thumbY / maxDist);
                     }
 
                     // Handle Look around on right side of screen
-                    if (touch.clientX > window.innerWidth / 2 && touch.identifier !== touchState.joystickTouchId) {
+                    if (touch.clientX > window.innerWidth * 0.35 && touch.identifier !== touchState.joystickTouchId) {
                         if (touchState.lookTouchId === null) {
                             touchState.lookTouchId = touch.identifier;
                             touchState.lastLookPos = { x: touch.clientX, y: touch.clientY };
@@ -689,7 +717,7 @@
                             const deltaY = touch.clientY - touchState.lastLookPos.y;
                             touchState.lastLookPos = { x: touch.clientX, y: touch.clientY };
 
-                            const sensitivity = 0.005;
+                            const sensitivity = 0.0045;
                             mouseLook.x -= deltaX * sensitivity;
                             mouseLook.y -= deltaY * sensitivity;
 
@@ -708,7 +736,9 @@
                         touchState.joystickTouchId = null;
                         touchState.joystickVector.x = 0;
                         touchState.joystickVector.z = 0;
-                        joystickThumb.style.transform = `translate(0px, 0px)`;
+                        if (joystickThumb) {
+                            joystickThumb.style.transform = `translate(0px, 0px)`;
+                        }
                     }
                     if (touch.identifier === touchState.lookTouchId) {
                         touchState.lookTouchId = null;
@@ -717,15 +747,21 @@
             });
 
             // Mobile Action Buttons
-            document.getElementById('btn-touch-shoot').addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                shootWeapon();
-            }, { passive: false });
+            const btnShoot = document.getElementById('btn-touch-shoot');
+            if (btnShoot) {
+                btnShoot.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    shootWeapon();
+                }, { passive: false });
+            }
 
-            document.getElementById('btn-touch-camouflage').addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                triggerCamouflage();
-            }, { passive: false });
+            const btnCamo = document.getElementById('btn-touch-camouflage');
+            if (btnCamo) {
+                btnCamo.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    triggerCamouflage();
+                }, { passive: false });
+            }
         }
 
         function startGame() {
@@ -740,7 +776,7 @@
             setupEntities();
 
             const canvasContainer = document.getElementById('canvas-container');
-            if (canvasContainer && canvasContainer.requestPointerLock) {
+            if (canvasContainer && canvasContainer.requestPointerLock && window.innerWidth > 1024) {
                 canvasContainer.requestPointerLock().catch(() => {});
             }
         }
@@ -748,20 +784,22 @@
         function triggerCamouflage() {
             if (!p1) return;
             p1.isCamouflaged = !p1.isCamouflaged;
-            p1.mesh.children[0].material.opacity = p1.isCamouflaged ? 0.2 : 1.0;
-            p1.mesh.children[0].material.transparent = true;
+            if (p1.mesh && p1.mesh.children[0]) {
+                p1.mesh.children[0].material.opacity = p1.isCamouflaged ? 0.25 : 1.0;
+                p1.mesh.children[0].material.transparent = true;
+            }
         }
 
         function shootWeapon() {
             const now = performance.now();
             const gun = guns[gameState.equippedGunIndex];
-            const fireRateBonus = Math.max(100, gun.fireRate - (gameState.upgrades.fireRateLvl - 1) * 50);
+            const fireRateBonus = Math.max(80, gun.fireRate - (gameState.upgrades.fireRateLvl - 1) * 45);
 
             if (now - lastShootTime < fireRateBonus) return;
             lastShootTime = now;
             SoundFX.playShoot();
 
-            const bulletGeo = new THREE.SphereGeometry(0.2, 8, 8);
+            const bulletGeo = new THREE.SphereGeometry(0.22, 8, 8);
             const bulletMat = new THREE.MeshBasicMaterial({ color: gun.color });
             const bulletMesh = new THREE.Mesh(bulletGeo, bulletMat);
 
@@ -772,9 +810,9 @@
             bullets.push({
                 mesh: bulletMesh,
                 dir: dir,
-                speed: 40,
-                life: 2.0,
-                damage: gun.damage * (1 + (gameState.upgrades.damageLvl - 1) * 0.2)
+                speed: 45,
+                life: 2.2,
+                damage: gun.damage * (1 + (gameState.upgrades.damageLvl - 1) * 0.25)
             });
         }
 
@@ -824,10 +862,7 @@
             const euler = new THREE.Euler(0, mouseLook.x, 0, 'YXZ');
             moveDir.applyEuler(euler);
 
-            const oldPos = p1.mesh.position.clone();
             p1.mesh.position.x += moveDir.x * currentSpeed * delta;
-            
-            // Check map boundaries
             const limit = gameState.mapLimit;
             p1.mesh.position.x = Math.max(-limit, Math.min(limit, p1.mesh.position.x));
             p1.mesh.position.z += moveDir.z * currentSpeed * delta;
@@ -838,7 +873,9 @@
                 if (Math.abs(p1.mesh.position.x - lava.position.x) < 3.2 && Math.abs(p1.mesh.position.z - lava.position.z) < 3.2) {
                     if (p1.role === 'runner') {
                         p1.role = 'seeker';
-                        p1.mesh.children[0].material.color.setHex(0xf43f5e);
+                        if (p1.mesh && p1.mesh.children[0]) {
+                            p1.mesh.children[0].material.color.setHex(0xf43f5e);
+                        }
                         document.getElementById('hud-role').innerText = "술래 (Seeker - 용암 감염!)";
                         document.getElementById('hud-role').className = "font-extrabold text-sm text-rose-400";
                         SoundFX.playTag();
@@ -855,15 +892,15 @@
             let seekerCount = 0;
             let runnerCount = 0;
 
+            const diffMultiplier = gameState.botDifficulty === 'easy' ? 0.8 : gameState.botDifficulty === 'hard' ? 1.2 : gameState.botDifficulty === 'extreme' ? 1.45 : 1.0;
+
             entities.forEach(bot => {
                 if (bot.isSeeker) seekerCount++;
                 else runnerCount++;
 
-                // Classic blocky upright movement (no swinging, stiff classic Roblox style)
                 let targetPos = p1.mesh.position;
                 
                 if (bot.isSeeker) {
-                    // Seeker chases player or nearest runner
                     let closestDist = bot.mesh.position.distanceTo(p1.mesh.position);
                     targetPos = p1.mesh.position;
 
@@ -878,53 +915,51 @@
                     });
 
                     const dir = new THREE.Vector3().subVectors(targetPos, bot.mesh.position).normalize();
-                    bot.mesh.position.addScaledVector(dir, bot.speed * delta);
+                    bot.mesh.position.addScaledVector(dir, bot.speed * diffMultiplier * delta);
                     bot.mesh.lookAt(targetPos.x, bot.mesh.position.y, targetPos.z);
 
                     // Tagging check
-                    if (bot.mesh.position.distanceTo(p1.mesh.position) < 1.2 && p1.role === 'runner') {
+                    if (bot.mesh.position.distanceTo(p1.mesh.position) < 1.3 && p1.role === 'runner') {
                         if (gameState.infectionMode) {
                             p1.role = 'seeker';
-                            p1.mesh.children[0].material.color.setHex(0xf43f5e);
+                            if (p1.mesh && p1.mesh.children[0]) {
+                                p1.mesh.children[0].material.color.setHex(0xf43f5e);
+                            }
                             document.getElementById('hud-role').innerText = "술래 (Seeker - 감염됨!)";
                             document.getElementById('hud-role').className = "font-extrabold text-sm text-rose-400";
                             SoundFX.playTag();
                         } else {
-                            alert("게임 오버! 술래에게 잡혔습니다!");
+                            showCustomMessage("게임 오버! 술래에게 잡혔습니다!");
                             returnToLobby();
                         }
                     }
                 } else {
-                    // Hiding Noobs: Match player speed, flee smartly, pass through walls!
                     const distToPlayer = bot.mesh.position.distanceTo(p1.mesh.position);
                     const fleeDir = new THREE.Vector3().subVectors(bot.mesh.position, p1.mesh.position).normalize();
                     
-                    if (distToPlayer < 12) {
-                        // Flee away with player matching speed
-                        const diffSliderVal = parseFloat(document.getElementById('custom-speed-slider')?.value || '1.2');
-                        bot.mesh.position.addScaledVector(fleeDir, p1.speed * diffSliderVal * 0.95 * delta);
+                    if (distToPlayer < 14) {
+                        bot.mesh.position.addScaledVector(fleeDir, p1.speed * 0.98 * diffMultiplier * delta);
                     } else {
-                        // Wander calmly
                         bot.wanderTimer -= delta;
                         if (bot.wanderTimer <= 0) {
-                            bot.wanderTimer = 3 + Math.random() * 2;
+                            bot.wanderTimer = 2.5 + Math.random() * 2;
                             bot.randomAngle = Math.random() * Math.PI * 2;
                         }
                         const wanderDir = new THREE.Vector3(Math.cos(bot.randomAngle), 0, Math.sin(bot.randomAngle));
-                        bot.mesh.position.addScaledVector(wanderDir, 3.0 * delta);
+                        bot.mesh.position.addScaledVector(wanderDir, 3.5 * delta);
                     }
 
-                    // Map limit clamp for runners passing through walls
                     const limit = gameState.mapLimit;
                     bot.mesh.position.x = Math.max(-limit, Math.min(limit, bot.mesh.position.x));
                     bot.mesh.position.z = Math.max(-limit, Math.min(limit, bot.mesh.position.z));
 
-                    // Lava pit check for bots
                     lavaAbysses.forEach(lava => {
                         if (Math.abs(bot.mesh.position.x - lava.position.x) < 3.0 && Math.abs(bot.mesh.position.z - lava.position.z) < 3.0) {
                             if (!bot.isSeeker && gameState.infectionMode) {
                                 bot.isSeeker = true;
-                                bot.mesh.children[0].material.color.setHex(0xf43f5e);
+                                if (bot.mesh && bot.mesh.children[0]) {
+                                    bot.mesh.children[0].material.color.setHex(0xf43f5e);
+                                }
                                 SoundFX.playTag();
                             }
                         }
@@ -944,15 +979,16 @@
                 b.mesh.position.addScaledVector(b.dir, b.speed * delta);
                 b.life -= delta;
 
-                // Check bullet hit on bots
                 let hit = false;
                 for (let j = 0; j < entities.length; j++) {
                     const bot = entities[j];
-                    if (b.mesh.position.distanceTo(bot.mesh.position) < 1.0) {
+                    if (b.mesh.position.distanceTo(bot.mesh.position) < 1.1) {
                         hit = true;
                         if (!bot.isSeeker && gameState.infectionMode) {
                             bot.isSeeker = true;
-                            bot.mesh.children[0].material.color.setHex(0xf43f5e);
+                            if (bot.mesh && bot.mesh.children[0]) {
+                                bot.mesh.children[0].material.color.setHex(0xf43f5e);
+                            }
                             SoundFX.playTag();
                         }
                         break;
@@ -973,3 +1009,5 @@
 
 </body>
 </html>
+```
+eof
