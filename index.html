@@ -24,7 +24,6 @@
             width: 100vw;
             height: 100vh;
         }
-        /* Custom Scrollbar for UIs */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -35,11 +34,9 @@
             background: #3b82f6;
             border-radius: 4px;
         }
-        /* Roulette wheel animation effect */
         .roulette-container {
             mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
         }
-        /* Crosshair styling */
         .crosshair {
             position: absolute;
             top: 50%;
@@ -47,7 +44,6 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
-        /* Glow animations */
         @keyframes pulse-glow {
             0%, 100% { filter: drop-shadow(0 0 15px rgba(234, 179, 8, 0.8)); }
             50% { filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.9)); }
@@ -75,7 +71,7 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">3D 총기 가챠 숨바꼭질</h1>
-                        <p class="text-xs text-slate-400">숨고, 추격하고, 총을 강화하여 승리하세요!</p>
+                        <p class="text-xs text-slate-400">백룸 UFO 추적 및 동굴 3칸 용암 심연 생존게임!</p>
                     </div>
                 </div>
                 <!-- Money & Stats -->
@@ -138,7 +134,7 @@
                             </h2>
                             <span class="text-xs bg-emerald-950 text-emerald-400 px-2 py-1 rounded border border-emerald-800">지속 강화</span>
                         </div>
-                        <p class="text-xs text-slate-400 mb-4">게임 중 데미지를 입히거나 승리하여 코인을 모아 총의 스펙을 올리세요!</p>
+                        <p class="text-xs text-slate-400 mb-4">게임 중 포인트를 모아 총의 스펙과 이동 속도를 업그레이드하세요!</p>
 
                         <!-- Upgrade List -->
                         <div class="space-y-3">
@@ -168,17 +164,26 @@
                             <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
                                 <div>
                                     <div class="text-sm font-bold text-slate-200">이동 스피드 레벨 <span id="lvl-movespeed" class="text-amber-400">1</span></div>
-                                    <div class="text-xs text-slate-400">캐릭터 이동 속도 +5%</div>
+                                    <div class="text-xs text-slate-400">캐릭터 이동 속도 +15% 증가</div>
                                 </div>
                                 <button id="btn-up-movespeed" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg transition active:scale-95">
                                     <span id="cost-movespeed">150</span> G
                                 </button>
                             </div>
+
+                            <!-- Manual Speed Multiplier Slider -->
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 mt-2">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-slate-200">내 이동 속도 배율 조절</span>
+                                    <span id="speed-slider-val" class="text-xs font-bold text-amber-400">1.0x</span>
+                                </div>
+                                <input type="range" id="custom-speed-slider" min="0.5" max="3.0" step="0.1" value="1.0" class="w-full accent-amber-500 cursor-pointer">
+                            </div>
                         </div>
                     </div>
 
                     <div class="mt-4 p-3 bg-indigo-950/40 rounded-xl border border-indigo-900/50 text-xs text-indigo-300">
-                        <i class="fa-solid fa-circle-info mr-1"></i> 총이 좋을수록 더 빠른 연사와 강한 데미지를 자랑합니다.
+                        <i class="fa-solid fa-circle-info mr-1"></i> 슬라이더로 내 스피드를 자유롭게 높여 엄청 빠르게 도망치세요!
                     </div>
                 </div>
 
@@ -194,23 +199,19 @@
                             <label class="block text-xs font-bold text-slate-400 mb-1">플레이어 모드</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <button id="mode-1p" class="py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs border border-indigo-400 shadow">1인 싱글 (AI전)</button>
-                                <button id="mode-2p" class="py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700">2인 코옵 (화면 분할/2P)</button>
+                                <button id="mode-2p" class="py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700">2인 코옵 (지원)</button>
                             </div>
                         </div>
 
                         <!-- Map Size selection -->
                         <div class="mb-4">
                             <label class="block text-xs font-bold text-slate-400 mb-1">전장 맵 크기 설정</label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button id="size-small" class="size-btn py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs border border-indigo-400 shadow">
-                                    <i class="fa-solid fa-compress-arrows-alt mr-1"></i> 작음 (Small)
-                                </button>
-                                <button id="size-medium" class="size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700">
-                                    <i class="fa-solid fa-expand-arrows-alt mr-1"></i> 보통 (Medium)
-                                </button>
-                                <button id="size-large" class="size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700">
-                                    <i class="fa-solid fa-maximize mr-1"></i> 큼 (Large)
-                                </button>
+                            <div class="grid grid-cols-5 gap-1">
+                                <button id="size-small" class="size-btn py-2 bg-indigo-600 text-white font-bold rounded-lg text-[10px] border border-indigo-400 shadow">작음</button>
+                                <button id="size-medium" class="size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-[10px] border border-slate-700">보통</button>
+                                <button id="size-large" class="size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-[10px] border border-slate-700">큼</button>
+                                <button id="size-verylarge" class="size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-[9px] border border-slate-700">매우큼</button>
+                                <button id="size-massive" class="size-btn py-2 bg-slate-800 text-rose-400 font-bold rounded-lg text-[9px] border border-rose-800">엄청큼🔥</button>
                             </div>
                         </div>
 
@@ -219,23 +220,45 @@
                             <label class="block text-xs font-bold text-slate-400 mb-1">전장 맵 선택</label>
                             <div class="grid grid-cols-3 gap-2">
                                 <button id="map-backrooms" class="map-btn p-2 rounded-xl border border-amber-500 bg-amber-950/40 text-amber-300 font-bold text-xs flex flex-col items-center gap-1 transition">
-                                    <i class="fa-solid fa-door-open text-base"></i> 백룸 (Backrooms)
+                                    <i class="fa-solid fa-door-open text-base"></i> 백룸(UFO)
                                 </button>
                                 <button id="map-iceland" class="map-btn p-2 rounded-xl border border-slate-700 bg-slate-950/40 text-slate-400 font-bold text-xs flex flex-col items-center gap-1 transition">
-                                    <i class="fa-solid fa-snowflake text-base"></i> 아이스랜드 (Iceland)
+                                    <i class="fa-solid fa-snowflake text-base"></i> 아이스랜드
                                 </button>
                                 <button id="map-factory" class="map-btn p-2 rounded-xl border border-slate-700 bg-slate-950/40 text-slate-400 font-bold text-xs flex flex-col items-center gap-1 transition">
-                                    <i class="fa-solid fa-industry text-base"></i> 팩토리 (Factory)
+                                    <i class="fa-solid fa-mountain text-base"></i> 동굴(용암3칸)
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Infection Mode Toggle (New) -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-400 mb-1">게임 룰 모드 (감염모드 / 감염모드X)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button id="mode-infection" class="rule-btn py-2 bg-rose-600 text-white font-bold rounded-lg text-xs border border-rose-400 shadow">
+                                    <i class="fa-solid fa-virus"></i> 감염모드 (잡히면 술래로 전염)
+                                </button>
+                                <button id="mode-infection-x" class="rule-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700">
+                                    <i class="fa-solid fa-shield-halved"></i> 감염모드X (잡히면 탈락/고정1술래)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="block text-xs font-bold text-slate-400 mb-1">봇(누브) AI 강약 조절</label>
+                            <div class="grid grid-cols-4 gap-1">
+                                <button id="diff-easy" class="diff-btn py-1.5 bg-slate-800 text-slate-400 font-bold rounded-lg text-[10px] border border-slate-700">초보 (Easy)</button>
+                                <button id="diff-normal" class="diff-btn py-1.5 bg-emerald-600 text-white font-bold rounded-lg text-[10px] border border-emerald-400 shadow">보통 (Normal)</button>
+                                <button id="diff-hard" class="diff-btn py-1.5 bg-slate-800 text-amber-400 font-bold rounded-lg text-[10px] border border-slate-700">어려움 (Hard)</button>
+                                <button id="diff-extreme" class="diff-btn py-1.5 bg-slate-800 text-rose-400 font-bold rounded-lg text-[10px] border border-rose-800">지옥 (Extreme)</button>
                             </div>
                         </div>
 
                         <!-- Info Box -->
                         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1">
-                            <div>• <strong class="text-slate-200">총 인원:</strong> 술래 1명 vs 숨는 사람 15명</div>
-                            <div>• <strong class="text-rose-400">내가 술래가 될 확률: 15%</strong></div>
-                            <div>• <strong class="text-emerald-400">제한시간:</strong> 5분 (300초)</div>
-                            <div>• <strong class="text-amber-400">규칙:</strong> 술래에게 데이면 같은 술래가 됩니다!</div>
+                            <div>• <strong class="text-rose-400">엄청큼 모드:</strong> 끝없는 거대 미로와 심연의 세계를 경험하세요!</div>
+                            <div>• <strong class="text-amber-400">백룸 특전:</strong> 공중을 떠도는 UFO가 쫓아와 잡히면 술래가 됩니다!</div>
+                            <div>• <strong class="text-emerald-400">꼬꼬마 누브:</strong> 꼬물거리지 않고 아주 꼿꼿한 자세로 미끄러지듯 이동합니다!</div>
                         </div>
                     </div>
 
@@ -248,7 +271,7 @@
 
             <!-- Footer controls info -->
             <div class="text-center text-xs text-slate-500 border-t border-slate-800/60 pt-3">
-                [조작법] WASD / 방향키: 이동 | Shift: 달리기 | Space: 점프 | 마우스: 화면 회전 / 클릭: 총 발사 | Esc: 마우스 해제
+                [조작법] WASD 또는 방향키(↑↓←→): 이동 | Shift: 달리기 | E: 페인트 위장 | 마우스: 화면 회전 / 클릭: 총 발사
             </div>
         </div>
 
@@ -260,14 +283,13 @@
 
             <!-- Wheel/Strip Animation Window -->
             <div class="w-full max-w-xl h-32 bg-slate-900 border-4 border-amber-500/50 rounded-2xl relative overflow-hidden shadow-2xl flex items-center">
-                <!-- Center Pointer indicator -->
                 <div class="absolute left-1/2 top-0 bottom-0 w-1 bg-yellow-400 z-20 -translate-x-1/2 shadow-[0_0_15px_#facc15]"></div>
                 <div class="absolute left-1/2 top-0 -translate-x-1/2 z-20 text-yellow-400 text-xl"><i class="fa-solid fa-caret-down"></i></div>
                 <div class="absolute left-1/2 bottom-0 -translate-x-1/2 z-20 text-yellow-400 text-xl"><i class="fa-solid fa-caret-up"></i></div>
 
                 <!-- Scrolling Strip -->
                 <div id="roulette-strip" class="flex gap-4 absolute left-1/2 whitespace-nowrap transition-transform duration-300 ease-out">
-                    <!-- Dynamic roulette cards will be injected here -->
+                    <!-- Dynamic roulette cards -->
                 </div>
             </div>
 
@@ -282,7 +304,7 @@
             </div>
         </div>
 
-        <!-- GAMEPLAY HUD (In-Game Overlay) -->
+        <!-- GAMEPLAY HUD -->
         <div id="game-hud" class="hidden absolute inset-0 pointer-events-none p-6 flex flex-col justify-between">
             <!-- Top Status Bar -->
             <div class="flex justify-between items-start">
@@ -301,7 +323,7 @@
                 <div class="bg-slate-900/80 backdrop-blur border border-slate-800 px-6 py-3 rounded-2xl shadow-xl flex items-center gap-6">
                     <div class="text-center">
                         <div class="text-xs text-slate-400">남은 숨는 사람</div>
-                        <div id="hud-runners-count" class="text-2xl font-black text-emerald-400">15</div>
+                        <div id="hud-runners-count" class="text-2xl font-black text-emerald-400">19</div>
                     </div>
                     <div class="text-slate-700 text-xl font-bold">VS</div>
                     <div class="text-center">
@@ -312,27 +334,24 @@
 
                 <!-- Right: Map & Score -->
                 <div class="bg-slate-900/80 backdrop-blur border border-slate-800 p-4 rounded-2xl shadow-xl text-right">
-                    <div id="hud-map-name" class="text-sm font-bold text-indigo-300">백룸 (Backrooms)</div>
-                    <div class="text-xs text-slate-400 mt-1">획득 코인: <span id="hud-coins" class="text-yellow-400 font-bold">0</span> G</div>
+                    <div id="hud-map-name" class="text-sm font-bold text-indigo-300">백룸 (UFO 추적)</div>
+                    <div class="text-xs text-slate-400 mt-1">포인트: <span id="hud-coins" class="text-yellow-400 font-bold">0</span> G</div>
                 </div>
             </div>
 
-            <!-- Crosshair in center -->
+            <!-- Crosshair -->
             <div class="crosshair flex items-center justify-center">
                 <div class="w-2 h-2 bg-emerald-400 rounded-full border border-black/50"></div>
             </div>
 
             <!-- Bottom Weapon & Stats Bar -->
             <div class="flex justify-between items-end">
-                <!-- Left: Controls Hint -->
                 <div class="flex items-end gap-3">
-                    <!-- Controls Hint -->
                     <div class="bg-slate-900/70 backdrop-blur p-3 rounded-xl border border-slate-800 text-xs text-slate-400 hidden sm:block">
-                        WASD / 방향키: 이동 | Space: 점프 | <strong class="text-emerald-400">E: 페인트로 숨기 (색칠 변장)</strong> | 클릭: 총 발사
+                        WASD / 방향키(↑↓←→): 이동 | <strong class="text-emerald-400">E: 페인트 위장</strong> | 클릭: 총 발사
                     </div>
                 </div>
 
-                <!-- Right: Gun Status -->
                 <div class="bg-slate-900/80 backdrop-blur border border-slate-800 p-4 rounded-2xl shadow-xl flex items-center gap-4">
                     <div class="text-right">
                         <div id="hud-gun-name" class="text-lg font-extrabold text-slate-100">기본 권총</div>
@@ -345,7 +364,7 @@
             </div>
         </div>
 
-        <!-- GAME OVER / RESULT MODAL -->
+        <!-- GAME OVER MODAL -->
         <div id="result-modal" class="hidden pointer-events-auto absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 z-50">
             <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-md w-full text-center shadow-2xl">
                 <div id="result-icon" class="text-6xl mb-4 text-emerald-400">
@@ -364,7 +383,7 @@
                         <span id="res-stat-damage" class="font-bold text-rose-400">0</span>
                     </div>
                     <div class="flex justify-between border-t border-slate-800 pt-2">
-                        <span class="text-slate-300 font-bold">획득한 보상 코인:</span>
+                        <span class="text-slate-300 font-bold">획득한 보상 포인트:</span>
                         <span id="res-stat-coins" class="font-bold text-yellow-400">+250 G</span>
                     </div>
                 </div>
@@ -378,13 +397,27 @@
     </div>
 
     <script>
-        // Game State Variables
+        let scene, camera, renderer, clock;
+        let mapObjects = [];
+        let entities = [];
+        let bullets = [];
+        let roamingMonsters = [];
+        let caveAbysses = [];
+        let backroomsUfos = [];
+        let p1 = null;
+        let lastShootTime = 0;
+        let lastPaintTime = 0;
+        const keyState = {};
+        const mouseLook = { x: 0, y: 0 };
+
         const gameState = {
             coins: 1000,
-            mode: '1p', // '1p' or '2p'
-            selectedMap: 'backrooms', // 'backrooms', 'iceland', 'factory'
-            mapSize: 'small', // 'small' (40x40), 'medium' (70x70), 'large' (100x100)
-            mapLimit: 20, // Boundary limit based on map size
+            mode: '1p',
+            infectionMode: true, // true: 감염모드, false: 감염모드X (탈락)
+            selectedMap: 'backrooms',
+            mapSize: 'small',
+            mapLimit: 20,
+            botDifficulty: 'normal',
             equippedGunIndex: 0,
             upgrades: {
                 damageLvl: 1,
@@ -392,16 +425,14 @@
                 moveSpeedLvl: 1
             },
             inGame: false,
-            timeRemaining: 300, // 5 minutes
-            myRole: 'runner', // 'seeker' or 'runner'
-            isSeekerProbability: 0.15, // 15% probability of player being initial seeker
+            timeRemaining: 300,
+            myRole: 'runner',
+            isSeekerProbability: 0.15,
             playerCoinsEarned: 0,
             playerDamageDealt: 0,
             playerTaggedCount: 0
         };
 
-        // Guns Database (Rarity & Odds matching requirements)
-        // Common 30%, Rare 20%, Epic 15%, Legendary 10%, Mythic 7%, Secret 5%, Impossible 3%
         const GUNS_DATABASE = [
             { id: 'common_pistol', name: '일반 글록 권총', rarity: '일반', chance: 30, color: '#94a3b8', fireRate: 0.6, damage: 20, speed: 1.0, bulletColor: 0xffff00 },
             { id: 'rare_smg', name: '레어 MP5', rarity: '레어', chance: 20, color: '#60a5fa', fireRate: 0.35, damage: 28, speed: 1.1, bulletColor: 0x3b82f6 },
@@ -419,278 +450,334 @@
                     this.ctx = new (window.AudioContext || window.webkitAudioContext)();
                 }
             },
-            playShoot() {
+            playTone(freq, type, duration, vol = 0.1) {
                 if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(400, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.1);
-            },
-            playTag() {
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-                osc.frequency.linearRampToValueAtTime(600, this.ctx.currentTime + 0.25);
-                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.25);
-            },
-            playWin() {
-                if (!this.ctx) return;
-                [261, 329, 392, 523].forEach((freq, idx) => {
+                try {
                     const osc = this.ctx.createOscillator();
                     const gain = this.ctx.createGain();
-                    osc.frequency.value = freq;
-                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime + idx * 0.1);
-                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.1 + 0.3);
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
                     osc.connect(gain);
                     gain.connect(this.ctx.destination);
-                    osc.start(this.ctx.currentTime + idx * 0.1);
-                    osc.stop(this.ctx.currentTime + idx * 0.1 + 0.3);
-                });
-            }
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            },
+            playShoot() { this.playTone(350, 'sawtooth', 0.1, 0.15); },
+            playTag() { this.playTone(600, 'sine', 0.2, 0.2); },
+            playWin() { this.playTone(800, 'triangle', 0.5, 0.2); }
         };
 
-        let scene, camera, renderer, clock;
-        let p1, entities = [];
-        let bullets = [];
-        let mapObjects = [];
-        let keyState = {};
-        let mouseLook = { x: 0, y: 0 };
-        let isPointerLocked = false;
-        let lastShootTime = 0;
-        let lastPaintTime = 0; // Cooldown for painting camouflage
-
-        // Initialize 3D Engine
         function init3DEngine() {
             const container = document.getElementById('canvas-container');
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0f172a);
-            scene.fog = new THREE.FogExp2(0x0f172a, 0.02);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             container.appendChild(renderer.domElement);
 
             clock = new THREE.Clock();
 
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
 
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(20, 40, 20);
-            dirLight.castShadow = true;
-            dirLight.shadow.mapSize.width = 1024;
-            dirLight.shadow.mapSize.height = 1024;
-            scene.add(dirLight);
-
-            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
         }
 
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        function createRobloxNoobMesh(isSeeker) {
+            const group = new THREE.Group();
+
+            const skinColor = 0xfde047;
+            const shirtColor = isSeeker ? 0x991b1b : 0x2563eb;
+            const pantsColor = isSeeker ? 0x450a0a : 0x16a34a;
+
+            const headMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.4 });
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), headMat);
+            head.position.y = 2.15;
+            head.castShadow = true;
+            group.add(head);
+
+            const torsoMat = new THREE.MeshStandardMaterial({ color: shirtColor, roughness: 0.5 });
+            const torso = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.2, 0.6), torsoMat);
+            torso.position.y = 1.3;
+            torso.castShadow = true;
+            group.add(torso);
+
+            const armMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.4 });
+            const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, 0.5), armMat);
+            leftArm.position.set(-0.75, 1.3, 0);
+            leftArm.castShadow = true;
+            group.add(leftArm);
+
+            const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, 0.5), armMat);
+            rightArm.position.set(0.75, 1.3, 0);
+            rightArm.castShadow = true;
+            group.add(rightArm);
+
+            const legMat = new THREE.MeshStandardMaterial({ color: pantsColor, roughness: 0.6 });
+            const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.0, 0.5), legMat);
+            leftLeg.position.set(-0.28, 0.5, 0);
+            leftLeg.castShadow = true;
+            group.add(leftLeg);
+
+            const rightLeg = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.0, 0.5), legMat);
+            rightLeg.position.set(0.28, 0.5, 0);
+            rightLeg.castShadow = true;
+            group.add(rightLeg);
+
+            if (isSeeker) {
+                const auraMat = new THREE.MeshBasicMaterial({ color: 0xef4444, wireframe: true, transparent: true, opacity: 0.5 });
+                const aura = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.6, 1.2), auraMat);
+                aura.position.y = 1.3;
+                group.add(aura);
+            }
+
+            const gunMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8 });
+            const gunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.8), gunMat);
+            gunMesh.position.set(0.5, 1.2, -0.5);
+            group.add(gunMesh);
+
+            return group;
         }
 
         function generateMap(mapType, sizeType = gameState.mapSize) {
-            // Clear existing map
             mapObjects.forEach(obj => scene.remove(obj));
             mapObjects = [];
+            roamingMonsters.forEach(m => scene.remove(m.mesh));
+            roamingMonsters = [];
+            caveAbysses.forEach(a => scene.remove(a.mesh));
+            caveAbysses = [];
+            backroomsUfos.forEach(u => scene.remove(u.mesh));
+            backroomsUfos = [];
 
-            // Define dynamic map size bounds
             let sizeLength = 50;
-            if (sizeType === 'small') sizeLength = 40;
-            else if (sizeType === 'medium') sizeLength = 70;
-            else if (sizeType === 'large') sizeLength = 100;
+            if (sizeType === 'small') sizeLength = 50;
+            else if (sizeType === 'medium') sizeLength = 90;
+            else if (sizeType === 'large') sizeLength = 150;
+            else if (sizeType === 'verylarge') sizeLength = 230;
+            else if (sizeType === 'massive') sizeLength = 350;
 
-            gameState.mapLimit = (sizeLength / 2) - 2;
+            gameState.mapLimit = (sizeLength / 2) - 3;
 
-            let floorColor = 0xb8a876; // Yellowish Carpet for Backrooms
-            let gridColor1 = 0xeab308;
-            let gridColor2 = 0x854d0e;
+            let floorColor = 0xb8a876;
             let fogColor = 0x262310;
             let lightColor = 0xfef08a;
+            let wallColorHex = 0xd97706;
 
-            if (mapType === 'iceland') {
-                floorColor = 0xdbeafe; // Snowy ice floor
-                gridColor1 = 0x38bdf8;
-                gridColor2 = 0x0284c7;
+            if (mapType === 'backrooms') {
+                floorColor = 0xb8a876;
+                fogColor = 0x262310;
+                lightColor = 0xfef08a;
+                wallColorHex = 0xd97706;
+
+                const ufoCount = (sizeType === 'massive') ? 5 : 2;
+                for (let u = 0; u < ufoCount; u++) {
+                    const ufoGroup = new THREE.Group();
+                    const saucerMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
+                    const saucer = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2.5, 0.5, 12), saucerMat);
+                    saucer.position.y = 3.5;
+                    saucer.castShadow = true;
+                    ufoGroup.add(saucer);
+
+                    const domeMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true });
+                    const dome = new THREE.Mesh(new THREE.SphereGeometry(0.8, 8, 8), domeMat);
+                    dome.position.y = 3.8;
+                    ufoGroup.add(dome);
+
+                    const beamMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.3 });
+                    const beam = new THREE.Mesh(new THREE.ConeGeometry(2.0, 3.5, 12), beamMat);
+                    beam.position.y = 1.75;
+                    ufoGroup.add(beam);
+
+                    const posX = (Math.random() - 0.5) * (gameState.mapLimit * 0.8);
+                    const posZ = (Math.random() - 0.5) * (gameState.mapLimit * 0.8);
+                    ufoGroup.position.set(posX, 0, posZ);
+                    scene.add(ufoGroup);
+
+                    backroomsUfos.push({
+                        mesh: ufoGroup,
+                        speed: 7.5,
+                        targetPos: new THREE.Vector3(posX, 0, posZ),
+                        changeDirTime: 0
+                    });
+                }
+            } else if (mapType === 'iceland') {
+                floorColor = 0xdbeafe;
                 fogColor = 0x0f172a;
                 lightColor = 0xe0f2fe;
+                wallColorHex = 0x38bdf8;
+
+                const monsterCount = (sizeType === 'massive') ? 5 : 2;
+                for (let m = 0; m < monsterCount; m++) {
+                    const monsterGroup = new THREE.Group();
+                    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x9333ea, roughness: 0.3 });
+                    const body = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.2, 8), bodyMat);
+                    body.position.y = 1.1;
+                    body.castShadow = true;
+                    monsterGroup.add(body);
+
+                    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                    const eye1 = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 6), eyeMat);
+                    eye1.position.set(0.3, 1.8, -0.4);
+                    const eye2 = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 6), eyeMat);
+                    eye2.position.set(-0.3, 1.8, -0.4);
+                    monsterGroup.add(eye1);
+                    monsterGroup.add(eye2);
+
+                    const posX = (Math.random() - 0.5) * (gameState.mapLimit * 0.8);
+                    const posZ = (Math.random() - 0.5) * (gameState.mapLimit * 0.8);
+                    monsterGroup.position.set(posX, 0, posZ);
+                    scene.add(monsterGroup);
+
+                    roamingMonsters.push({
+                        mesh: monsterGroup,
+                        speed: 8.5,
+                        targetPos: new THREE.Vector3(posX, 0, posZ),
+                        changeDirTime: 0
+                    });
+                }
             } else if (mapType === 'factory') {
-                floorColor = 0x1e293b; // Dark metal/concrete floor
-                gridColor1 = 0xef4444;
-                gridColor2 = 0x7f1d1d;
-                fogColor = 0x180c0c;
-                lightColor = 0xfca5a5;
+                floorColor = 0x332211;
+                fogColor = 0x0d0804;
+                lightColor = 0xf97316;
+                wallColorHex = 0x78350f;
+
+                const pitCount = (sizeType === 'massive' || sizeType === 'verylarge') ? 6 : 3;
+                for (let i = 0; i < pitCount; i++) {
+                    const posX = (Math.random() - 0.5) * (sizeLength * 0.6);
+                    const posZ = (Math.random() - 0.5) * (sizeLength * 0.6);
+
+                    const abyssGroup = new THREE.Group();
+                    const pitGeo = new THREE.BoxGeometry(6.0, 0.2, 6.0);
+                    const pitMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+                    const pitMesh = new THREE.Mesh(pitGeo, pitMat);
+                    pitMesh.position.y = -0.05;
+                    abyssGroup.add(pitMesh);
+
+                    const lavaLight = new THREE.PointLight(0xf97316, 1.5, 10);
+                    lavaLight.position.y = 0.5;
+                    abyssGroup.add(lavaLight);
+
+                    abyssGroup.position.set(posX, 0, posZ);
+                    scene.add(abyssGroup);
+
+                    caveAbysses.push({
+                        mesh: abyssGroup,
+                        pos: new THREE.Vector3(posX, 0, posZ),
+                        width: 6.0,
+                        depth: 6.0
+                    });
+                }
             }
 
             scene.background = new THREE.Color(fogColor);
-            scene.fog = new THREE.FogExp2(fogColor, 0.015);
+            scene.fog = new THREE.FogExp2(fogColor, (sizeType === 'verylarge' || sizeType === 'massive') ? 0.003 : 0.012);
 
-            // Floor Mat
-            const floorMat = new THREE.MeshStandardMaterial({ color: floorColor, roughness: 0.7, metalness: mapType === 'factory' ? 0.3 : 0.1 });
+            const floorMat = new THREE.MeshStandardMaterial({ color: floorColor, roughness: 0.8 });
             const floor = new THREE.Mesh(new THREE.PlaneGeometry(sizeLength, sizeLength), floorMat);
             floor.rotation.x = -Math.PI / 2;
             floor.receiveShadow = true;
             scene.add(floor);
             mapObjects.push(floor);
 
-            // Visual Grid Helper on floor
-            const grid = new THREE.GridHelper(sizeLength, Math.floor(sizeLength / 2), gridColor1, gridColor2);
+            const grid = new THREE.GridHelper(sizeLength, Math.floor(sizeLength / 4), 0xffffff, 0x444444);
             grid.position.y = 0.02;
             scene.add(grid);
             mapObjects.push(grid);
 
-            // Theme Specific Ambient Lights
-            const mapLight = new THREE.DirectionalLight(lightColor, 0.6);
-            mapLight.position.set(10, 30, 10);
+            const wallMat = new THREE.MeshStandardMaterial({ 
+                color: (sizeType === 'large' || sizeType === 'verylarge' || sizeType === 'massive') ? 0xb91c1c : wallColorHex, 
+                roughness: 0.5 
+            });
+            
+            const cols = sizeType === 'small' ? 9 : (sizeType === 'medium' ? 15 : (sizeType === 'large' ? 21 : (sizeType === 'verylarge' ? 27 : 35)));
+            const rows = cols;
+            const cellW = sizeLength / cols;
+            const wallHeight = 5.5;
+            const wallThickness = cellW * 0.20;
+
+            let maze = Array(rows).fill(0).map(() => Array(cols).fill(1));
+
+            function carve(cx, cz) {
+                maze[cz][cx] = 0;
+                const dirs = [[0, -2], [0, 2], [-2, 0], [2, 0]].sort(() => Math.random() - 0.5);
+                for (let [dx, dz] of dirs) {
+                    const nx = cx + dx;
+                    const nz = cz + dz;
+                    if (nx > 0 && nx < cols - 1 && nz > 0 && nz < rows - 1 && maze[nz][nx] === 1) {
+                        maze[nz - dz / 2][nx - dx / 2] = 0;
+                        carve(nx, nz);
+                    }
+                }
+            }
+
+            carve(1, 1);
+
+            const midR = Math.floor(rows / 2);
+            const midC = Math.floor(cols / 2);
+            for (let r = midR - 1; r <= midR + 1; r++) {
+                for (let c = midC - 1; c <= midC + 1; c++) {
+                    if (r >= 0 && r < rows && c >= 0 && c < cols) {
+                        maze[r][c] = 0;
+                    }
+                }
+            }
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (maze[r][c] === 1) {
+                        const wx = (c - cols / 2) * cellW + cellW / 2;
+                        const wz = (r - rows / 2) * cellW + cellW / 2;
+
+                        const wallGeo = new THREE.BoxGeometry(wallThickness, wallHeight, wallThickness);
+                        const wall = new THREE.Mesh(wallGeo, wallMat);
+                        wall.position.set(wx, wallHeight / 2, wz);
+                        wall.castShadow = true;
+                        wall.receiveShadow = true;
+                        scene.add(wall);
+                        mapObjects.push(wall);
+                    }
+                }
+            }
+
+            const mapLight = new THREE.DirectionalLight(lightColor, 0.7);
+            mapLight.position.set(20, 50, 20);
             scene.add(mapLight);
             mapObjects.push(mapLight);
-
-            // Map-specific decorative structures
-            const numProps = sizeType === 'small' ? 8 : sizeType === 'medium' ? 14 : 20;
-            const limit = gameState.mapLimit * 0.8;
-
-            for (let i = 0; i < numProps; i++) {
-                const px = (Math.random() - 0.5) * limit * 2;
-                const pz = (Math.random() - 0.5) * limit * 2;
-                if (Math.abs(px) < 4 && Math.abs(pz) < 4) continue; // Keep center spawn clear
-
-                let propMesh;
-                if (mapType === 'backrooms') {
-                    // Backrooms iconic mono-yellow pillars
-                    const mat = new THREE.MeshStandardMaterial({ color: 0xd4c485, roughness: 0.9 });
-                    propMesh = new THREE.Mesh(new THREE.BoxGeometry(2, 4, 2), mat);
-                    propMesh.position.set(px, 2, pz);
-                } else if (mapType === 'iceland') {
-                    // Ice pillars / Ice crystals
-                    const mat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.1, metalness: 0.8, transparent: true, opacity: 0.85 });
-                    propMesh = new THREE.Mesh(new THREE.ConeGeometry(1.5, 4, 6), mat);
-                    propMesh.position.set(px, 2, pz);
-                } else if (mapType === 'factory') {
-                    // Industrial Metal Crates
-                    const mat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.4 });
-                    propMesh = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.5, 2.5), mat);
-                    propMesh.position.set(px, 1.25, pz);
-                }
-
-                if (propMesh) {
-                    propMesh.castShadow = true;
-                    propMesh.receiveShadow = true;
-                    scene.add(propMesh);
-                    mapObjects.push(propMesh);
-                }
-            }
-        }
-
-        function createCharacterMesh(isSeeker) {
-            const group = new THREE.Group();
-            
-            // Body
-            const bodyMat = new THREE.MeshStandardMaterial({
-                color: isSeeker ? 0xef4444 : 0x10b981,
-                roughness: 0.5
-            });
-            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 1.8, 12), bodyMat);
-            body.position.y = 0.9;
-            body.castShadow = true;
-            group.add(body);
-
-            // Head
-            const headMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc });
-            const head = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 12), headMat);
-            head.position.y = 2.1;
-            head.castShadow = true;
-            group.add(head);
-
-            // Seeker Red Glowing Aura Tag
-            if (isSeeker) {
-                const auraMat = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
-                const aura = new THREE.Mesh(new THREE.SphereGeometry(1.2, 8, 8), auraMat);
-                aura.position.y = 1.2;
-                group.add(aura);
-            }
-
-            // Simple Gun Model held in hand
-            const gunMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8 });
-            const gunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.8), gunMat);
-            gunMesh.position.set(0.5, 1.2, -0.4);
-            group.add(gunMesh);
-
-            return group;
-        }
-
-        // Paint Camouflage Mechanic: Changes player color to blend into environment walls or floor
-        function triggerPaintCamouflage() {
-            if (!gameState.inGame || !p1 || p1.isSeeker) return;
-            const now = clock.getElapsedTime();
-            if (now - lastPaintTime < 4.0) return; // 4s cooldown
-            lastPaintTime = now;
-
-            // Pick a camouflage color matching the map or random wall palette
-            let camoColors = [0xd4c485, 0xb8a876, 0x854d0e]; // Backrooms yellow tones
-            if (gameState.selectedMap === 'iceland') camoColors = [0xdbeafe, 0x38bdf8, 0xbae6fd];
-            if (gameState.selectedMap === 'factory') camoColors = [0x1e293b, 0x334155, 0x475569];
-
-            const chosenColor = camoColors[Math.floor(Math.random() * camoColors.length)];
-
-            // Apply camo color to player mesh body
-            const bodyMesh = p1.mesh.children[0];
-            if (bodyMesh && bodyMesh.material) {
-                bodyMesh.material.color.setHex(chosenColor);
-                bodyMesh.material.roughness = 0.2; // Glossy shiny camouflage effect
-            }
-
-            // Show temporary HUD notification
-            showCamouflageNotice("🎨 페인트 은장 위장 성공! 술래의 시야에 덜 띱니다!");
-            SoundFX.playTag();
-        }
-
-        function showCamouflageNotice(msg) {
-            let notice = document.getElementById('camo-notice');
-            if (!notice) {
-                notice = document.createElement('div');
-                notice.id = 'camo-notice';
-                notice.className = 'absolute top-24 left-1/2 -translate-x-1/2 bg-emerald-950/90 text-emerald-300 px-4 py-2 rounded-xl border border-emerald-600 text-sm font-bold shadow-2xl z-50 transition-opacity duration-300';
-                document.getElementById('game-hud').appendChild(notice);
-            }
-            notice.textContent = msg;
-            notice.style.opacity = '1';
-            setTimeout(() => {
-                notice.style.opacity = '0';
-            }, 3000);
         }
 
         function setupEntities() {
-            // Remove previous entities
             entities.forEach(e => scene.remove(e.mesh));
             entities = [];
 
-            // Determine if Player 1 is the Seeker (15% chance as specified)
             const playerIsSeeker = Math.random() < gameState.isSeekerProbability;
             gameState.myRole = playerIsSeeker ? 'seeker' : 'runner';
 
-            const totalCount = 16; // 1 seeker + 15 runners
-            let seekerAssigned = false;
+            const totalCount = 28; 
+            // STRICTLY ONE SEEKER ONLY: If player is not seeker, select exactly ONE bot index (1 to 27) as seeker.
+            const seekerIndex = playerIsSeeker ? -1 : Math.floor(Math.random() * (totalCount - 1)) + 1;
+
+            let baseSpeedVal = 9.5;
+            let seekerSpeedMultiplier = 1.15;
+            if (gameState.botDifficulty === 'easy') {
+                baseSpeedVal = 6.5;
+                seekerSpeedMultiplier = 1.02;
+            } else if (gameState.botDifficulty === 'hard') {
+                baseSpeedVal = 11.5;
+                seekerSpeedMultiplier = 1.25;
+            } else if (gameState.botDifficulty === 'extreme') {
+                baseSpeedVal = 14.0;
+                seekerSpeedMultiplier = 1.4;
+            }
 
             for (let i = 0; i < totalCount; i++) {
                 const isPlayer = (i === 0);
@@ -698,23 +785,25 @@
 
                 if (isPlayer) {
                     isSeeker = playerIsSeeker;
-                    if (isSeeker) seekerAssigned = true;
                 } else {
-                    if (!seekerAssigned && (i === totalCount - 1 || Math.random() < 0.2)) {
+                    if (i === seekerIndex) {
                         isSeeker = true;
-                        seekerAssigned = true;
                     }
                 }
 
-                // Random spawn position
                 const angle = (i / totalCount) * Math.PI * 2;
-                const dist = 4 + Math.random() * (gameState.mapLimit * 0.7);
+                const dist = 3 + Math.random() * (gameState.mapLimit * 0.5);
                 const posX = Math.cos(angle) * dist;
                 const posZ = Math.sin(angle) * dist;
 
-                const mesh = createCharacterMesh(isSeeker);
+                const mesh = createRobloxNoobMesh(isSeeker);
                 mesh.position.set(posX, 0, posZ);
                 scene.add(mesh);
+
+                let entitySpeed = isSeeker ? (baseSpeedVal * seekerSpeedMultiplier) : baseSpeedVal;
+                if (isPlayer) {
+                    entitySpeed = 9.5;
+                }
 
                 entities.push({
                     id: i,
@@ -722,26 +811,23 @@
                     isSeeker: isSeeker,
                     mesh: mesh,
                     velocity: new THREE.Vector3(),
-                    speed: isSeeker ? 11 : 9.5,
+                    speed: entitySpeed,
                     targetPos: new THREE.Vector3(posX, 0, posZ),
                     changeDirTime: 0,
                     hp: 100
                 });
             }
 
-            // Player 1 reference
             p1 = entities[0];
-            
-            // Update HUD text
             updateHUDStatus();
         }
 
         function updatePlayer(delta) {
             if (!p1) return;
 
-            // Apply Move Speed Upgrades
-            const speedBonus = 1 + (gameState.upgrades.moveSpeedLvl - 1) * 0.05;
-            const currentSpeed = p1.speed * speedBonus;
+            const upgradeBonus = 1 + (gameState.upgrades.moveSpeedLvl - 1) * 0.15;
+            const customSliderVal = parseFloat(document.getElementById('custom-speed-slider')?.value || '1.0');
+            const currentSpeed = p1.speed * upgradeBonus * customSliderVal;
 
             const moveDir = new THREE.Vector3();
             if (keyState['KeyW'] || keyState['ArrowUp']) moveDir.z -= 1;
@@ -751,18 +837,37 @@
 
             moveDir.normalize();
 
-            // Rotate direction according to mouse look
             const euler = new THREE.Euler(0, mouseLook.x, 0, 'YXZ');
             moveDir.applyEuler(euler);
 
-            p1.mesh.position.addScaledVector(moveDir, currentSpeed * delta);
+            const oldPos = p1.mesh.position.clone();
+            
+            p1.mesh.position.x += moveDir.x * currentSpeed * delta;
+            for (let i = 2; i < mapObjects.length; i++) {
+                const obj = mapObjects[i];
+                if (obj instanceof THREE.Mesh && obj.geometry instanceof THREE.BoxGeometry) {
+                    if (Math.abs(p1.mesh.position.x - obj.position.x) < 0.65 && Math.abs(p1.mesh.position.z - obj.position.z) < 0.65) {
+                        p1.mesh.position.x = oldPos.x;
+                        break;
+                    }
+                }
+            }
 
-            // Dynamic Map Boundary Constraints
+            p1.mesh.position.z += moveDir.z * currentSpeed * delta;
+            for (let i = 2; i < mapObjects.length; i++) {
+                const obj = mapObjects[i];
+                if (obj instanceof THREE.Mesh && obj.geometry instanceof THREE.BoxGeometry) {
+                    if (Math.abs(p1.mesh.position.x - obj.position.x) < 0.65 && Math.abs(p1.mesh.position.z - obj.position.z) < 0.65) {
+                        p1.mesh.position.z = oldPos.z;
+                        break;
+                    }
+                }
+            }
+
             const limit = gameState.mapLimit;
             p1.mesh.position.x = Math.max(-limit, Math.min(limit, p1.mesh.position.x));
             p1.mesh.position.z = Math.max(-limit, Math.min(limit, p1.mesh.position.z));
 
-            // Camera follow Player 1
             camera.rotation.set(mouseLook.y, mouseLook.x, 0, 'YXZ');
             const cameraOffset = new THREE.Vector3(0, 2.0, 0);
             camera.position.copy(p1.mesh.position).add(cameraOffset);
@@ -772,11 +877,34 @@
             const now = clock.getElapsedTime();
             const limit = gameState.mapLimit;
 
+            let aiReactionInterval = 1.0;
+            if (gameState.botDifficulty === 'easy') aiReactionInterval = 2.0;
+            if (gameState.botDifficulty === 'hard') aiReactionInterval = 0.5;
+            if (gameState.botDifficulty === 'extreme') aiReactionInterval = 0.25;
+
             entities.forEach(ent => {
                 if (ent.isPlayer) return;
 
+                if (!ent.isSeeker && p1 && !p1.isSeeker) {
+                    const distToPlayer = ent.mesh.position.distanceTo(p1.mesh.position);
+                    if (distToPlayer < (gameState.botDifficulty === 'extreme' ? 35 : 20)) {
+                        const fleeDir = new THREE.Vector3().subVectors(ent.mesh.position, p1.mesh.position);
+                        fleeDir.y = 0;
+                        fleeDir.normalize();
+                        ent.targetPos.copy(ent.mesh.position).addScaledVector(fleeDir, 18);
+                    }
+                } else if (!ent.isSeeker && p1 && p1.isSeeker) {
+                    const distToPlayer = ent.mesh.position.distanceTo(p1.mesh.position);
+                    if (distToPlayer < 40) {
+                        const fleeDir = new THREE.Vector3().subVectors(ent.mesh.position, p1.mesh.position);
+                        fleeDir.y = 0;
+                        fleeDir.normalize();
+                        ent.targetPos.copy(ent.mesh.position).addScaledVector(fleeDir, 25);
+                    }
+                }
+
                 if (now > ent.changeDirTime) {
-                    ent.changeDirTime = now + 1.5 + Math.random() * 2.5;
+                    ent.changeDirTime = now + aiReactionInterval + Math.random() * 0.8;
                     
                     if (ent.isSeeker) {
                         let nearestRunner = null;
@@ -793,46 +921,137 @@
                         if (nearestRunner) {
                             ent.targetPos.copy(nearestRunner.mesh.position);
                         }
-                    } else {
-                        let closestSeeker = null;
-                        let minDist = Infinity;
-                        entities.forEach(other => {
-                            if (other.isSeeker) {
-                                const d = ent.mesh.position.distanceTo(other.mesh.position);
-                                if (d < minDist) {
-                                    minDist = d;
-                                    closestSeeker = other;
-                                }
-                            }
-                        });
-
-                        if (closestSeeker && minDist < limit * 0.8) {
-                            const fleeDir = new THREE.Vector3()
-                                .subVectors(ent.mesh.position, closestSeeker.mesh.position)
-                                .normalize();
-                            ent.targetPos.copy(ent.mesh.position).addScaledVector(fleeDir, limit * 0.6);
-                        } else {
-                            ent.targetPos.set(
-                                (Math.random() - 0.5) * limit * 1.8,
-                                0,
-                                (Math.random() - 0.5) * limit * 1.8
-                            );
-                        }
+                    } else if (!p1 || p1.isSeeker) {
+                        ent.targetPos.set(
+                            (Math.random() - 0.5) * limit * 1.8,
+                            0,
+                            (Math.random() - 0.5) * limit * 1.8
+                        );
                     }
                 }
 
                 const dir = new THREE.Vector3().subVectors(ent.targetPos, ent.mesh.position);
                 dir.y = 0;
-                if (dir.length() > 0.5) {
+                if (dir.length() > 0.4) {
                     dir.normalize();
-                    ent.mesh.position.addScaledVector(dir, ent.speed * delta);
+                    const nextX = ent.mesh.position.x + dir.x * ent.speed * delta;
+                    const nextZ = ent.mesh.position.z + dir.z * ent.speed * delta;
+                    
+                    let hitWall = false;
+                    if (ent.isSeeker) {
+                        for (let i = 2; i < mapObjects.length; i++) {
+                            const obj = mapObjects[i];
+                            if (obj instanceof THREE.Mesh && obj.geometry instanceof THREE.BoxGeometry) {
+                                if (Math.abs(nextX - obj.position.x) < 0.7 && Math.abs(nextZ - obj.position.z) < 0.7) {
+                                    hitWall = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!hitWall || ent.isSeeker) {
+                        ent.mesh.position.x = nextX;
+                        ent.mesh.position.z = nextZ;
+                    } else {
+                        ent.targetPos.set(
+                            (Math.random() - 0.5) * limit,
+                            0,
+                            (Math.random() - 0.5) * limit
+                        );
+                    }
+
+                    // 꼿꼿한 자세 유지 (팔다리 회전 애니메이션 제거)
                     ent.mesh.lookAt(ent.mesh.position.x + dir.x, ent.mesh.position.y, ent.mesh.position.z + dir.z);
                 }
 
-                // Dynamic boundary clamp
                 ent.mesh.position.x = Math.max(-limit, Math.min(limit, ent.mesh.position.x));
                 ent.mesh.position.z = Math.max(-limit, Math.min(limit, ent.mesh.position.z));
             });
+
+            if (gameState.selectedMap === 'backrooms') {
+                backroomsUfos.forEach(ufo => {
+                    if (now > ufo.changeDirTime) {
+                        ufo.changeDirTime = now + 2.0 + Math.random() * 1.5;
+                        let target = p1;
+                        entities.forEach(e => {
+                            if (!e.isSeeker && ufo.mesh.position.distanceTo(e.mesh.position) < ufo.mesh.position.distanceTo(target.mesh.position)) {
+                                target = e;
+                            }
+                        });
+                        ufo.targetPos.copy(target.mesh.position);
+                    }
+
+                    const udir = new THREE.Vector3().subVectors(ufo.targetPos, ufo.mesh.position);
+                    udir.y = 0;
+                    if (udir.length() > 0.4) {
+                        udir.normalize();
+                        ufo.mesh.position.addScaledVector(udir, ufo.speed * delta);
+                        ufo.mesh.lookAt(ufo.mesh.position.x + udir.x, ufo.mesh.position.y, ufo.mesh.position.z + udir.z);
+                    }
+
+                    entities.forEach(ent => {
+                        if (!ent.isSeeker && ufo.mesh.position.distanceTo(ent.mesh.position) < 1.8) {
+                            turnIntoSeeker(ent);
+                            SoundFX.playTag();
+                            if (ent.isPlayer) {
+                                showCamouflageNotice("🛸 백룸 UFO에게 붙잡혀 술래가 되었습니다!");
+                            }
+                        }
+                    });
+                });
+            }
+
+            if (gameState.selectedMap === 'iceland') {
+                roamingMonsters.forEach(m => {
+                    if (now > m.changeDirTime) {
+                        m.changeDirTime = now + 1.5 + Math.random() * 1.5;
+                        let target = p1;
+                        entities.forEach(e => {
+                            if (!e.isSeeker && m.mesh.position.distanceTo(e.mesh.position) < m.mesh.position.distanceTo(target.mesh.position)) {
+                                target = e;
+                            }
+                        });
+                        m.targetPos.copy(target.mesh.position);
+                    }
+
+                    const mdir = new THREE.Vector3().subVectors(m.targetPos, m.mesh.position);
+                    mdir.y = 0;
+                    if (mdir.length() > 0.3) {
+                        mdir.normalize();
+                        m.mesh.position.addScaledVector(mdir, m.speed * delta);
+                        m.mesh.lookAt(m.mesh.position.x + mdir.x, m.mesh.position.y, m.mesh.position.z + mdir.z);
+                    }
+
+                    entities.forEach(ent => {
+                        if (!ent.isSeeker && m.mesh.position.distanceTo(ent.mesh.position) < 1.6) {
+                            turnIntoSeeker(ent);
+                            SoundFX.playTag();
+                            if (ent.isPlayer) {
+                                showCamouflageNotice("⚠️ 아이스랜드 괴물에게 잡혀 술래가 되었습니다!");
+                            }
+                        }
+                    });
+                });
+            }
+
+            if (gameState.selectedMap === 'factory') {
+                caveAbysses.forEach(abyss => {
+                    entities.forEach(ent => {
+                        if (!ent.isSeeker) {
+                            const dx = Math.abs(ent.mesh.position.x - abyss.pos.x);
+                            const dz = Math.abs(ent.mesh.position.z - abyss.pos.z);
+                            if (dx < abyss.width / 2 && dz < abyss.depth / 2) {
+                                turnIntoSeeker(ent);
+                                SoundFX.playTag();
+                                if (ent.isPlayer) {
+                                    showCamouflageNotice("🔥 동굴 용암 심연에 빠져 즉시 술래가 되었습니다!");
+                                }
+                            }
+                        }
+                    });
+                });
+            }
         }
 
         function updateBullets(delta) {
@@ -841,24 +1060,21 @@
                 b.life -= delta;
                 b.mesh.position.addScaledVector(b.dir, b.speed * delta);
 
-                // Collision with entities
                 entities.forEach(ent => {
                     if (ent !== b.owner && !ent.isSeeker) {
                         const dist = b.mesh.position.distanceTo(ent.mesh.position.clone().add(new THREE.Vector3(0, 1, 0)));
-                        if (dist < 1.2) {
-                            // Bullet Hit! Convert Runner into Seeker (Tag)
+                        if (dist < 1.3) {
                             turnIntoSeeker(ent);
                             if (b.owner.isPlayer) {
                                 gameState.playerDamageDealt += Math.round(b.damage);
                                 gameState.playerCoinsEarned += 30;
                                 SoundFX.playTag();
                             }
-                            b.life = 0; // Destroy bullet
+                            b.life = 0;
                         }
                     }
                 });
 
-                // Remove expired bullets
                 if (b.life <= 0) {
                     scene.remove(b.mesh);
                     bullets.splice(i, 1);
@@ -871,24 +1087,36 @@
             const runners = entities.filter(e => !e.isSeeker);
 
             seekers.forEach(seeker => {
-                runners.forEach(runner => {
+                runners.forEach((runner, index) => {
                     const dist = seeker.mesh.position.distanceTo(runner.mesh.position);
                     if (dist < 1.5) {
-                        // Tagged by physical touch!
-                        turnIntoSeeker(runner);
-                        if (seeker.isPlayer) {
-                            gameState.playerTaggedCount++;
-                            gameState.playerCoinsEarned += 100;
+                        if (gameState.infectionMode) {
+                            turnIntoSeeker(runner);
+                            if (seeker.isPlayer) {
+                                gameState.playerTaggedCount++;
+                                gameState.playerCoinsEarned += 100;
+                            }
+                            SoundFX.playTag();
+                        } else {
+                            // 감염모드X: 잡히면 영구 탈락 (씬에서 제거)
+                            scene.remove(runner.mesh);
+                            entities = entities.filter(e => e !== runner);
+                            if (runner.isPlayer) {
+                                endGame('defeat', '술래에게 잡혀 탈락하였습니다! (감염모드X)');
+                                return;
+                            } else {
+                                gameState.playerCoinsEarned += 50;
+                                SoundFX.playTag();
+                                showCamouflageNotice("⚠️ 상대방이 술래에게 잡혀 탈락했습니다!");
+                            }
                         }
-                        SoundFX.playTag();
                     }
                 });
             });
 
-            // Check Win/Loss Condition
-            if (runners.length === 0) {
-                // All runners converted to seekers!
-                endGame(p1.isSeeker ? 'victory' : 'defeat', '모든 숨는 사람이 술래에게 잡혔습니다!');
+            const remainingRunners = entities.filter(e => !e.isSeeker).length;
+            if (remainingRunners === 0) {
+                endGame(p1.isSeeker ? 'victory' : 'defeat', '모든 숨는 사람이 잡혔습니다!');
             }
         }
 
@@ -897,9 +1125,8 @@
             entity.isSeeker = true;
             entity.speed = 11;
 
-            // Re-create mesh with glowing red seeker aura
             scene.remove(entity.mesh);
-            entity.mesh = createCharacterMesh(true);
+            entity.mesh = createRobloxNoobMesh(true);
             scene.add(entity.mesh);
 
             if (entity.isPlayer) {
@@ -928,23 +1155,55 @@
             document.getElementById('hud-coins').textContent = gameState.playerCoinsEarned;
         }
 
+        function triggerPaintCamouflage() {
+            if (!gameState.inGame || !p1 || p1.isSeeker) return;
+            const now = clock.getElapsedTime();
+            if (now - lastPaintTime < 4.0) return;
+            lastPaintTime = now;
+
+            let camoColors = [0xd4c485, 0xb8a876, 0x854d0e];
+            if (gameState.selectedMap === 'iceland') camoColors = [0xdbeafe, 0x38bdf8, 0xbae6fd];
+            if (gameState.selectedMap === 'factory') camoColors = [0x332211, 0x78350f, 0x451a03];
+
+            const chosenColor = camoColors[Math.floor(Math.random() * camoColors.length)];
+            const bodyMesh = p1.mesh.children[1];
+            if (bodyMesh && bodyMesh.material) {
+                bodyMesh.material.color.setHex(chosenColor);
+            }
+
+            showCamouflageNotice("🎨 페인트 은장 위장 성공! 술래의 시야에 덜 뷘다!");
+            SoundFX.playTag();
+        }
+
+        function showCamouflageNotice(msg) {
+            let notice = document.getElementById('camo-notice');
+            if (!notice) {
+                notice = document.createElement('div');
+                notice.id = 'camo-notice';
+                notice.className = 'absolute top-24 left-1/2 -translate-x-1/2 bg-emerald-950/90 text-emerald-300 px-4 py-2 rounded-xl border border-emerald-600 text-sm font-bold shadow-2xl z-50 transition-opacity duration-300';
+                document.getElementById('game-hud').appendChild(notice);
+            }
+            notice.textContent = msg;
+            notice.style.opacity = '1';
+            setTimeout(() => {
+                notice.style.opacity = '0';
+            }, 3000);
+        }
+
         function startGame() {
             SoundFX.init();
             gameState.inGame = true;
-            gameState.timeRemaining = 300; // 5 min
+            gameState.timeRemaining = 300;
             gameState.playerCoinsEarned = 0;
             gameState.playerDamageDealt = 0;
             gameState.playerTaggedCount = 0;
 
-            // UI toggles
             document.getElementById('lobby-screen').classList.add('hidden');
             document.getElementById('game-hud').classList.remove('hidden');
 
-            // Generate map & entities
             generateMap(gameState.selectedMap);
             setupEntities();
 
-            // Request Pointer Lock for controls
             document.getElementById('canvas-container').requestPointerLock();
         }
 
@@ -952,12 +1211,10 @@
             gameState.inGame = false;
             document.exitPointerLock();
 
-            // Award coins back to persistent total
             const bonusCoins = result === 'victory' ? 250 : 80;
             const totalEarned = gameState.playerCoinsEarned + bonusCoins;
             gameState.coins += totalEarned;
 
-            // Update Result Modal
             const modal = document.getElementById('result-modal');
             const title = document.getElementById('result-title');
             const desc = document.getElementById('result-desc');
@@ -986,10 +1243,7 @@
         }
 
         function spinGachaRoulette() {
-            if (gameState.coins < 100) {
-                alert('코인이 부족합니다! (100 G 필요)');
-                return;
-            }
+            if (gameState.coins < 100) return;
             gameState.coins -= 100;
             document.getElementById('lobby-coins').textContent = gameState.coins;
 
@@ -1000,8 +1254,6 @@
             modal.classList.remove('hidden');
             resBox.classList.add('hidden');
 
-            // Determine Result Item based on Weighted Probability Table
-            // Odds: Common 30%, Rare 20%, Epic 15%, Legendary 10%, Mythic 7%, Secret 5%, Impossible 3% (Total = 90 weight)
             const rnd = Math.random() * 90;
             let cumulative = 0;
             let wonGunIndex = 0;
@@ -1014,10 +1266,9 @@
                 }
             }
 
-            // Build Roulette Visual Strip (30 Random Cards + Final Result Card)
             strip.innerHTML = '';
             const totalCards = 30;
-            const targetIndex = 25; // Index where the winning item lands
+            const targetIndex = 25;
 
             for (let i = 0; i < totalCards; i++) {
                 const gun = (i === targetIndex) ? GUNS_DATABASE[wonGunIndex] : GUNS_DATABASE[Math.floor(Math.random() * GUNS_DATABASE.length)];
@@ -1033,8 +1284,7 @@
                 strip.appendChild(card);
             }
 
-            // Animate Scrolling Effect
-            const cardWidth = 160 + 16; // width + gap
+            const cardWidth = 176;
             const targetX = -(targetIndex * cardWidth) + (cardWidth / 2);
             strip.style.transition = 'none';
             strip.style.transform = 'translateX(0px)';
@@ -1044,7 +1294,6 @@
                 strip.style.transform = `translateX(${targetX}px)`;
             }, 50);
 
-            // Show Result UI after animation finishes
             setTimeout(() => {
                 const wonGun = GUNS_DATABASE[wonGunIndex];
                 gameState.equippedGunIndex = wonGunIndex;
@@ -1084,7 +1333,7 @@
                     document.getElementById('lvl-damage').textContent = gameState.upgrades.damageLvl;
                     document.getElementById('cost-damage').textContent = upgradeCosts.damage;
                     document.getElementById('lobby-coins').textContent = gameState.coins;
-                } else alert('코인이 부족합니다!');
+                }
             });
 
             document.getElementById('btn-up-firerate').addEventListener('click', () => {
@@ -1095,7 +1344,7 @@
                     document.getElementById('lvl-firerate').textContent = gameState.upgrades.fireRateLvl;
                     document.getElementById('cost-firerate').textContent = upgradeCosts.firerate;
                     document.getElementById('lobby-coins').textContent = gameState.coins;
-                } else alert('코인이 부족합니다!');
+                }
             });
 
             document.getElementById('btn-up-movespeed').addEventListener('click', () => {
@@ -1106,15 +1355,13 @@
                     document.getElementById('lvl-movespeed').textContent = gameState.upgrades.moveSpeedLvl;
                     document.getElementById('cost-movespeed').textContent = upgradeCosts.movespeed;
                     document.getElementById('lobby-coins').textContent = gameState.coins;
-                } else alert('코인이 부족합니다!');
+                }
             });
         }
 
         function setupControls() {
             window.addEventListener('keydown', (e) => {
                 keyState[e.code] = true;
-
-                // Press 'E' to trigger Paint Camouflage Hide
                 if (e.code === 'KeyE') {
                     triggerPaintCamouflage();
                 }
@@ -1131,17 +1378,11 @@
                     mouseLook.x -= e.movementX * sensitivity;
                     mouseLook.y -= e.movementY * sensitivity;
 
-                    // Clamp pitch (look up / down limits)
                     const maxPitch = Math.PI / 2.2;
                     mouseLook.y = Math.max(-maxPitch, Math.min(maxPitch, mouseLook.y));
                 }
             });
 
-            document.addEventListener('pointerlockchange', () => {
-                isPointerLocked = (document.pointerLockElement === document.getElementById('canvas-container') || document.pointerLockElement === document.body);
-            });
-
-            // Shoot weapon on click
             window.addEventListener('mousedown', (e) => {
                 if (gameState.inGame && e.button === 0) {
                     shootWeapon();
@@ -1154,7 +1395,6 @@
             const now = clock.getElapsedTime();
             const gun = GUNS_DATABASE[gameState.equippedGunIndex];
             
-            // Apply Fire Rate upgrades (decreases cooldown)
             const fireRateReduction = (gameState.upgrades.fireRateLvl - 1) * 0.08;
             const effectiveCooldown = Math.max(0.02, gun.fireRate * (1 - fireRateReduction));
 
@@ -1163,20 +1403,16 @@
 
             SoundFX.playShoot();
 
-            // Damage multiplier from upgrades
             const damageMultiplier = 1 + (gameState.upgrades.damageLvl - 1) * 0.10;
             const finalDamage = gun.damage * damageMultiplier;
 
-            // Create bullet mesh
             const bulletGeo = new THREE.SphereGeometry(0.15, 8, 8);
             const bulletMat = new THREE.MeshBasicMaterial({ color: gun.bulletColor || 0xffff00 });
             const bulletMesh = new THREE.Mesh(bulletGeo, bulletMat);
 
-            // Position at player camera eyes
             const spawnPos = p1.mesh.position.clone().add(new THREE.Vector3(0, 1.5, 0));
             bulletMesh.position.copy(spawnPos);
 
-            // Compute shot direction based on camera rotation
             const shootDir = new THREE.Vector3(0, 0, -1);
             const euler = new THREE.Euler(mouseLook.y, mouseLook.x, 0, 'YXZ');
             shootDir.applyEuler(euler).normalize();
@@ -1198,10 +1434,9 @@
         function gameLoop() {
             requestAnimationFrame(gameLoop);
 
-            const delta = clock.getDelta();
+            const delta = clock ? clock.getDelta() : 0.016;
 
             if (gameState.inGame) {
-                // Timer countdown
                 timerAccumulator += delta;
                 if (timerAccumulator >= 1.0) {
                     timerAccumulator -= 1.0;
@@ -1227,7 +1462,9 @@
                 checkTagCollisions();
             }
 
-            renderer.render(scene, camera);
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
         }
 
         window.onload = function() {
@@ -1236,23 +1473,58 @@
             setupUpgradeButtons();
             updateEquippedGunUI();
 
-            // Map Size Buttons
+            const speedSlider = document.getElementById('custom-speed-slider');
+            const speedValLabel = document.getElementById('speed-slider-val');
+            if (speedSlider && speedValLabel) {
+                speedSlider.addEventListener('input', (e) => {
+                    speedValLabel.textContent = `${e.target.value}x`;
+                });
+            }
+
+            const diffBtns = document.querySelectorAll('.diff-btn');
+            diffBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    diffBtns.forEach(b => {
+                        b.className = 'diff-btn py-1.5 bg-slate-800 text-slate-400 font-bold rounded-lg text-[10px] border border-slate-700';
+                    });
+                    const target = e.currentTarget;
+                    if (target.id === 'diff-easy') {
+                        target.className = 'diff-btn py-1.5 bg-indigo-600 text-white font-bold rounded-lg text-[10px] border border-indigo-400 shadow';
+                        gameState.botDifficulty = 'easy';
+                    } else if (target.id === 'diff-normal') {
+                        target.className = 'diff-btn py-1.5 bg-emerald-600 text-white font-bold rounded-lg text-[10px] border border-emerald-400 shadow';
+                        gameState.botDifficulty = 'normal';
+                    } else if (target.id === 'diff-hard') {
+                        target.className = 'diff-btn py-1.5 bg-amber-600 text-white font-bold rounded-lg text-[10px] border border-amber-400 shadow';
+                        gameState.botDifficulty = 'hard';
+                    } else if (target.id === 'diff-extreme') {
+                        target.className = 'diff-btn py-1.5 bg-rose-600 text-white font-bold rounded-lg text-[10px] border border-rose-800 shadow';
+                        gameState.botDifficulty = 'extreme';
+                    }
+                });
+            });
+
             const sizeBtns = document.querySelectorAll('.size-btn');
             sizeBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     sizeBtns.forEach(b => {
-                        b.className = 'size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700';
+                        b.className = 'size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-[10px] sm:text-xs border border-slate-700';
                     });
                     const target = e.currentTarget;
-                    target.className = 'size-btn py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs border border-indigo-400 shadow';
+                    if (target.id === 'size-massive') {
+                        target.className = 'size-btn py-2 bg-rose-950 text-rose-300 font-bold rounded-lg text-[9px] border border-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.6)]';
+                    } else {
+                        target.className = 'size-btn py-2 bg-indigo-600 text-white font-bold rounded-lg text-[10px] border border-indigo-400 shadow';
+                    }
                     
                     if (target.id === 'size-small') gameState.mapSize = 'small';
                     if (target.id === 'size-medium') gameState.mapSize = 'medium';
                     if (target.id === 'size-large') gameState.mapSize = 'large';
+                    if (target.id === 'size-verylarge') gameState.mapSize = 'verylarge';
+                    if (target.id === 'size-massive') gameState.mapSize = 'massive';
                 });
             });
 
-            // Map selection buttons
             const mapBtns = document.querySelectorAll('.map-btn');
             mapBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -1266,12 +1538,11 @@
                     if (target.id === 'map-iceland') gameState.selectedMap = 'iceland';
                     if (target.id === 'map-factory') gameState.selectedMap = 'factory';
 
-                    const names = { backrooms: '백룸 (Backrooms)', iceland: '아이스랜드 (Iceland)', factory: '팩토리 (Factory)' };
+                    const names = { backrooms: '백룸 (UFO 추적)', iceland: '아이스랜드', factory: '동굴 (용암 3칸)' };
                     document.getElementById('hud-map-name').textContent = names[gameState.selectedMap];
                 });
             });
 
-            // Mode buttons
             document.getElementById('mode-1p').addEventListener('click', () => {
                 gameState.mode = '1p';
                 document.getElementById('mode-1p').className = 'py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs border border-indigo-400 shadow';
@@ -1283,23 +1554,35 @@
                 document.getElementById('mode-1p').className = 'py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700';
             });
 
-            // Gacha Spin Button
+            const ruleBtns = document.querySelectorAll('.rule-btn');
+            ruleBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    ruleBtns.forEach(b => {
+                        b.className = 'rule-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700';
+                    });
+                    const target = e.currentTarget;
+                    target.className = 'rule-btn py-2 bg-rose-600 text-white font-bold rounded-lg text-xs border border-rose-400 shadow';
+                    if (target.id === 'mode-infection') {
+                        gameState.infectionMode = true;
+                    } else if (target.id === 'mode-infection-x') {
+                        gameState.infectionMode = false;
+                    }
+                });
+            });
+
             document.getElementById('btn-spin-gacha').addEventListener('click', spinGachaRoulette);
             document.getElementById('btn-close-gacha').addEventListener('click', () => {
                 document.getElementById('gacha-modal').classList.add('hidden');
             });
 
-            // Start Game Button
             document.getElementById('btn-start-game').addEventListener('click', startGame);
 
-            // Return to Lobby Button
             document.getElementById('btn-return-lobby').addEventListener('click', () => {
                 document.getElementById('result-modal').classList.add('hidden');
                 document.getElementById('game-hud').classList.add('hidden');
                 document.getElementById('lobby-screen').classList.remove('hidden');
             });
 
-            // Start Render Animation Loop
             gameLoop();
         };
     </script>
