@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D 총기 가챠 숨바꼭질 (Hide & Seek 3D)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        /* Custom Scrollbar for UIs */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        /* Roulette wheel animation effect */
+        .roulette-container {
+            mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+        }
+        /* Crosshair styling */
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        /* Glow animations */
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(234, 179, 8, 0.8)); }
+            50% { filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.9)); }
+        }
+        .impossible-glow {
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+    </style>
+</head>
+<body class="relative w-screen h-screen overflow-hidden bg-slate-950">
+
+    <!-- 3D Render Canvas Container -->
+    <div id="canvas-container" class="w-full h-full absolute inset-0 z-0"></div>
+
+    <!-- UI Overlay Parent -->
+    <div id="ui-layer" class="relative z-10 w-full h-full pointer-events-none">
+
+        <!-- LOBBY SCREEN -->
+        <div id="lobby-screen" class="pointer-events-auto absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col justify-between p-6 overflow-y-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                        <i class="fa-solid fa-gun"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">3D 총기 가챠 숨바꼭질</h1>
+                        <p class="text-xs text-slate-400">숨고, 추격하고, 총을 강화하여 승리하세요!</p>
+                    </div>
+                </div>
+                <!-- Money & Stats -->
+                <div class="flex gap-4">
+                    <div class="bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-coins text-yellow-400 text-lg"></i>
+                        <span id="lobby-coins" class="text-lg font-bold text-yellow-400">1000</span> G
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-auto max-w-7xl mx-auto w-full py-6">
+                
+                <!-- Card 1: Gun Gacha / Roulette -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <h2 class="text-lg font-bold text-indigo-300 flex items-center gap-2">
+                                <i class="fa-solid fa-dice text-indigo-400"></i> 아이템 룰렛 (총 뽑기)
+                            </h2>
+                            <span class="text-xs bg-indigo-950 text-indigo-400 px-2 py-1 rounded border border-indigo-800">1회 100 G</span>
+                        </div>
+                        
+                        <!-- Equipped Gun Display -->
+                        <div id="equipped-gun-card" class="bg-slate-950 border border-slate-800 rounded-xl p-4 mb-4 text-center">
+                            <div class="text-xs text-slate-500 uppercase tracking-widest mb-1">현재 장착된 총기</div>
+                            <div id="equipped-gun-name" class="text-xl font-extrabold text-slate-200">기본 권총</div>
+                            <div id="equipped-gun-rarity" class="inline-block text-xs font-semibold px-2 py-0.5 rounded mt-1 bg-slate-800 text-slate-400">일반 (Common)</div>
+                            <div class="grid grid-cols-2 gap-2 mt-3 text-xs text-slate-400 border-t border-slate-800 pt-3">
+                                <div>발사 속도: <span id="gun-stat-firerate" class="text-emerald-400 font-bold">1.0초</span></div>
+                                <div>데미지: <span id="gun-stat-damage" class="text-rose-400 font-bold">20</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Roulette Rates Table -->
+                        <div class="text-xs space-y-1 mb-4 bg-slate-950/50 p-3 rounded-lg border border-slate-800/80">
+                            <div class="font-bold text-slate-400 mb-1">획득 확률 안내:</div>
+                            <div class="flex justify-between"><span class="text-slate-400">일반</span><span class="text-slate-200 font-semibold">30%</span></div>
+                            <div class="flex justify-between"><span class="text-blue-400">레어</span><span class="text-blue-300 font-semibold">20%</span></div>
+                            <div class="flex justify-between"><span class="text-purple-400">에픽</span><span class="text-purple-300 font-semibold">15%</span></div>
+                            <div class="flex justify-between"><span class="text-amber-400">레전더리</span><span class="text-amber-300 font-semibold">10%</span></div>
+                            <div class="flex justify-between"><span class="text-rose-400">신화</span><span class="text-rose-300 font-semibold">7%</span></div>
+                            <div class="flex justify-between"><span class="text-cyan-400">비밀</span><span class="text-cyan-300 font-semibold">5%</span></div>
+                            <div class="flex justify-between"><span class="text-pink-400 font-bold">불가능한</span><span class="text-pink-300 font-bold">3%</span></div>
+                        </div>
+                    </div>
+
+                    <button id="btn-spin-gacha" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95 flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate"></i> 총 뽑기 (100 G)
+                    </button>
+                </div>
+
+                <!-- Card 2: Gun Upgrade / Level Up -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <h2 class="text-lg font-bold text-emerald-300 flex items-center gap-2">
+                                <i class="fa-solid fa-turn-up text-emerald-400"></i> 총 능력치 업그레이드
+                            </h2>
+                            <span class="text-xs bg-emerald-950 text-emerald-400 px-2 py-1 rounded border border-emerald-800">지속 강화</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-4">게임 중 데미지를 입히거나 승리하여 코인을 모아 총의 스펙을 올리세요!</p>
+
+                        <!-- Upgrade List -->
+                        <div class="space-y-3">
+                            <!-- Damage Upgrade -->
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="text-sm font-bold text-slate-200">데미지 레벨 <span id="lvl-damage" class="text-emerald-400">1</span></div>
+                                    <div class="text-xs text-slate-400">공격 데미지 +10%</div>
+                                </div>
+                                <button id="btn-up-damage" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition active:scale-95">
+                                    <span id="cost-damage">150</span> G
+                                </button>
+                            </div>
+
+                            <!-- Speed / Fire Rate Upgrade -->
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="text-sm font-bold text-slate-200">발사 스피드 레벨 <span id="lvl-firerate" class="text-cyan-400">1</span></div>
+                                    <div class="text-xs text-slate-400">연사 딜레이 -8%</div>
+                                </div>
+                                <button id="btn-up-firerate" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-lg transition active:scale-95">
+                                    <span id="cost-firerate">150</span> G
+                                </button>
+                            </div>
+
+                            <!-- Move Speed Upgrade -->
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                                <div>
+                                    <div class="text-sm font-bold text-slate-200">이동 스피드 레벨 <span id="lvl-movespeed" class="text-amber-400">1</span></div>
+                                    <div class="text-xs text-slate-400">캐릭터 이동 속도 +5%</div>
+                                </div>
+                                <button id="btn-up-movespeed" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg transition active:scale-95">
+                                    <span id="cost-movespeed">150</span> G
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-indigo-950/40 rounded-xl border border-indigo-900/50 text-xs text-indigo-300">
+                        <i class="fa-solid fa-circle-info mr-1"></i> 총이 좋을수록 더 빠른 연사와 강한 데미지를 자랑합니다.
+                    </div>
+                </div>
+
+                <!-- Card 3: Game Setup & Start -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition">
+                    <div>
+                        <h2 class="text-lg font-bold text-rose-300 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-gamepad text-rose-400"></i> 게임 설정 & 맵 선택
+                        </h2>
+
+                        <!-- Mode selection -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-400 mb-1">플레이어 모드</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button id="mode-1p" class="py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs border border-indigo-400 shadow">1인 싱글 (AI전)</button>
+                                <button id="mode-2p" class="py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700">2인 코옵 (화면 분할/2P)</button>
+                            </div>
+                        </div>
+
+                        <!-- Map Size selection -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-400 mb-1">전장 맵 크기 설정</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button id="size-small" class="size-btn py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs border border-indigo-400 shadow">
+                                    <i class="fa-solid fa-compress-arrows-alt mr-1"></i> 작음 (Small)
+                                </button>
+                                <button id="size-medium" class="size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700">
+                                    <i class="fa-solid fa-expand-arrows-alt mr-1"></i> 보통 (Medium)
+                                </button>
+                                <button id="size-large" class="size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700">
+                                    <i class="fa-solid fa-maximize mr-1"></i> 큼 (Large)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Map selection -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-400 mb-1">전장 맵 선택</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button id="map-backrooms" class="map-btn p-2 rounded-xl border border-amber-500 bg-amber-950/40 text-amber-300 font-bold text-xs flex flex-col items-center gap-1 transition">
+                                    <i class="fa-solid fa-door-open text-base"></i> 백룸 (Backrooms)
+                                </button>
+                                <button id="map-iceland" class="map-btn p-2 rounded-xl border border-slate-700 bg-slate-950/40 text-slate-400 font-bold text-xs flex flex-col items-center gap-1 transition">
+                                    <i class="fa-solid fa-snowflake text-base"></i> 아이스랜드 (Iceland)
+                                </button>
+                                <button id="map-factory" class="map-btn p-2 rounded-xl border border-slate-700 bg-slate-950/40 text-slate-400 font-bold text-xs flex flex-col items-center gap-1 transition">
+                                    <i class="fa-solid fa-industry text-base"></i> 팩토리 (Factory)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Info Box -->
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1">
+                            <div>• <strong class="text-slate-200">총 인원:</strong> 술래 1명 vs 숨는 사람 15명</div>
+                            <div>• <strong class="text-rose-400">내가 술래가 될 확률: 15%</strong></div>
+                            <div>• <strong class="text-emerald-400">제한시간:</strong> 5분 (300초)</div>
+                            <div>• <strong class="text-amber-400">규칙:</strong> 술래에게 데이면 같은 술래가 됩니다!</div>
+                        </div>
+                    </div>
+
+                    <!-- Game Start Button -->
+                    <button id="btn-start-game" class="w-full py-4 mt-4 bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-extrabold text-lg rounded-xl shadow-xl transition transform active:scale-95 tracking-wider flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> 게임 시작하기
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer controls info -->
+            <div class="text-center text-xs text-slate-500 border-t border-slate-800/60 pt-3">
+                [조작법] WASD / 방향키: 이동 | Shift: 달리기 | Space: 점프 | 마우스: 화면 회전 / 클릭: 총 발사 | Esc: 마우스 해제
+            </div>
+        </div>
+
+        <!-- GACHA ROULETTE MODAL -->
+        <div id="gacha-modal" class="hidden pointer-events-auto absolute inset-0 bg-slate-950/95 backdrop-blur-lg flex flex-col items-center justify-center p-4 z-50">
+            <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-red-500 mb-6">
+                아이템 룰렛 가챠
+            </h2>
+
+            <!-- Wheel/Strip Animation Window -->
+            <div class="w-full max-w-xl h-32 bg-slate-900 border-4 border-amber-500/50 rounded-2xl relative overflow-hidden shadow-2xl flex items-center">
+                <!-- Center Pointer indicator -->
+                <div class="absolute left-1/2 top-0 bottom-0 w-1 bg-yellow-400 z-20 -translate-x-1/2 shadow-[0_0_15px_#facc15]"></div>
+                <div class="absolute left-1/2 top-0 -translate-x-1/2 z-20 text-yellow-400 text-xl"><i class="fa-solid fa-caret-down"></i></div>
+                <div class="absolute left-1/2 bottom-0 -translate-x-1/2 z-20 text-yellow-400 text-xl"><i class="fa-solid fa-caret-up"></i></div>
+
+                <!-- Scrolling Strip -->
+                <div id="roulette-strip" class="flex gap-4 absolute left-1/2 whitespace-nowrap transition-transform duration-300 ease-out">
+                    <!-- Dynamic roulette cards will be injected here -->
+                </div>
+            </div>
+
+            <!-- Result Card -->
+            <div id="gacha-result" class="mt-8 text-center hidden">
+                <div class="text-xs text-slate-400 mb-1">뽑은 아이템!</div>
+                <div id="gacha-res-name" class="text-3xl font-black text-amber-400 mb-1">불가능한 레이저 캐논</div>
+                <div id="gacha-res-rarity" class="text-sm font-bold text-pink-400 mb-4">등급: 불가능한 (3%)</div>
+                <button id="btn-close-gacha" class="px-8 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-lg transition active:scale-95">
+                    장착하고 확인
+                </button>
+            </div>
+        </div>
+
+        <!-- GAMEPLAY HUD (In-Game Overlay) -->
+        <div id="game-hud" class="hidden absolute inset-0 pointer-events-none p-6 flex flex-col justify-between">
+            <!-- Top Status Bar -->
+            <div class="flex justify-between items-start">
+                <!-- Left: Time & Role -->
+                <div class="bg-slate-900/80 backdrop-blur border border-slate-800 p-4 rounded-2xl shadow-xl">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fa-regular fa-clock text-rose-400 text-xl"></i>
+                        <span id="hud-timer" class="text-2xl font-black font-mono text-slate-100">05:00</span>
+                    </div>
+                    <div id="hud-role-badge" class="px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-emerald-950 text-emerald-400 border border-emerald-800 inline-block">
+                        숨는 사람 (Runner)
+                    </div>
+                </div>
+
+                <!-- Center: Match Info -->
+                <div class="bg-slate-900/80 backdrop-blur border border-slate-800 px-6 py-3 rounded-2xl shadow-xl flex items-center gap-6">
+                    <div class="text-center">
+                        <div class="text-xs text-slate-400">남은 숨는 사람</div>
+                        <div id="hud-runners-count" class="text-2xl font-black text-emerald-400">15</div>
+                    </div>
+                    <div class="text-slate-700 text-xl font-bold">VS</div>
+                    <div class="text-center">
+                        <div class="text-xs text-slate-400">술래 수</div>
+                        <div id="hud-seekers-count" class="text-2xl font-black text-rose-500">1</div>
+                    </div>
+                </div>
+
+                <!-- Right: Map & Score -->
+                <div class="bg-slate-900/80 backdrop-blur border border-slate-800 p-4 rounded-2xl shadow-xl text-right">
+                    <div id="hud-map-name" class="text-sm font-bold text-indigo-300">백룸 (Backrooms)</div>
+                    <div class="text-xs text-slate-400 mt-1">획득 코인: <span id="hud-coins" class="text-yellow-400 font-bold">0</span> G</div>
+                </div>
+            </div>
+
+            <!-- Crosshair in center -->
+            <div class="crosshair flex items-center justify-center">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full border border-black/50"></div>
+            </div>
+
+            <!-- Bottom Weapon & Stats Bar -->
+            <div class="flex justify-between items-end">
+                <!-- Left: Controls Hint -->
+                <div class="flex items-end gap-3">
+                    <!-- Controls Hint -->
+                    <div class="bg-slate-900/70 backdrop-blur p-3 rounded-xl border border-slate-800 text-xs text-slate-400 hidden sm:block">
+                        WASD / 방향키: 이동 | Space: 점프 | <strong class="text-emerald-400">E: 페인트로 숨기 (색칠 변장)</strong> | 클릭: 총 발사
+                    </div>
+                </div>
+
+                <!-- Right: Gun Status -->
+                <div class="bg-slate-900/80 backdrop-blur border border-slate-800 p-4 rounded-2xl shadow-xl flex items-center gap-4">
+                    <div class="text-right">
+                        <div id="hud-gun-name" class="text-lg font-extrabold text-slate-100">기본 권총</div>
+                        <div id="hud-gun-rarity" class="text-xs font-semibold text-slate-400">일반 (Common)</div>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 text-2xl">
+                        <i class="fa-solid fa-crosshairs"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME OVER / RESULT MODAL -->
+        <div id="result-modal" class="hidden pointer-events-auto absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 z-50">
+            <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-md w-full text-center shadow-2xl">
+                <div id="result-icon" class="text-6xl mb-4 text-emerald-400">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 id="result-title" class="text-3xl font-black text-slate-100 mb-2">승리하였습니다!</h2>
+                <p id="result-desc" class="text-sm text-slate-400 mb-6">제한시간 동안 술래를 피해 무사히 생존하였습니다.</p>
+
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 mb-6 space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">감염시킨 숨는 사람:</span>
+                        <span id="res-stat-tagged" class="font-bold text-slate-200">0 명</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">입힌 데미지:</span>
+                        <span id="res-stat-damage" class="font-bold text-rose-400">0</span>
+                    </div>
+                    <div class="flex justify-between border-t border-slate-800 pt-2">
+                        <span class="text-slate-300 font-bold">획득한 보상 코인:</span>
+                        <span id="res-stat-coins" class="font-bold text-yellow-400">+250 G</span>
+                    </div>
+                </div>
+
+                <button id="btn-return-lobby" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition active:scale-95">
+                    로비로 돌아가기
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Game State Variables
+        const gameState = {
+            coins: 1000,
+            mode: '1p', // '1p' or '2p'
+            selectedMap: 'backrooms', // 'backrooms', 'iceland', 'factory'
+            mapSize: 'small', // 'small' (40x40), 'medium' (70x70), 'large' (100x100)
+            mapLimit: 20, // Boundary limit based on map size
+            equippedGunIndex: 0,
+            upgrades: {
+                damageLvl: 1,
+                fireRateLvl: 1,
+                moveSpeedLvl: 1
+            },
+            inGame: false,
+            timeRemaining: 300, // 5 minutes
+            myRole: 'runner', // 'seeker' or 'runner'
+            isSeekerProbability: 0.15, // 15% probability of player being initial seeker
+            playerCoinsEarned: 0,
+            playerDamageDealt: 0,
+            playerTaggedCount: 0
+        };
+
+        // Guns Database (Rarity & Odds matching requirements)
+        // Common 30%, Rare 20%, Epic 15%, Legendary 10%, Mythic 7%, Secret 5%, Impossible 3%
+        const GUNS_DATABASE = [
+            { id: 'common_pistol', name: '일반 글록 권총', rarity: '일반', chance: 30, color: '#94a3b8', fireRate: 0.6, damage: 20, speed: 1.0, bulletColor: 0xffff00 },
+            { id: 'rare_smg', name: '레어 MP5', rarity: '레어', chance: 20, color: '#60a5fa', fireRate: 0.35, damage: 28, speed: 1.1, bulletColor: 0x3b82f6 },
+            { id: 'epic_ar', name: '에픽 AK-47', rarity: '에픽', chance: 15, color: '#c084fc', fireRate: 0.22, damage: 38, speed: 1.2, bulletColor: 0xa855f7 },
+            { id: 'legendary_sniper', name: '레전더리 궤도 라이플', rarity: '레전더리', chance: 10, color: '#fbbf24', fireRate: 0.15, damage: 55, speed: 1.35, bulletColor: 0xeab308 },
+            { id: 'mythic_minigun', name: '신화 발칸 미니건', rarity: '신화', chance: 7, color: '#f87171', fireRate: 0.08, damage: 70, speed: 1.5, bulletColor: 0xef4444 },
+            { id: 'secret_plasma', name: '비밀 플라즈마포', rarity: '비밀', chance: 5, color: '#22d3ee', fireRate: 0.05, damage: 95, speed: 1.7, bulletColor: 0x06b6d4 },
+            { id: 'impossible_god', name: '불가능한 파멸의 멸망건', rarity: '불가능한', chance: 3, color: '#f472b6', fireRate: 0.02, damage: 150, speed: 2.0, bulletColor: 0xec4899 }
+        ];
+
+        const SoundFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            playShoot() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.1);
+            },
+            playTag() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(600, this.ctx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.25);
+            },
+            playWin() {
+                if (!this.ctx) return;
+                [261, 329, 392, 523].forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.1 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.1);
+                    osc.stop(this.ctx.currentTime + idx * 0.1 + 0.3);
+                });
+            }
+        };
+
+        let scene, camera, renderer, clock;
+        let p1, entities = [];
+        let bullets = [];
+        let mapObjects = [];
+        let keyState = {};
+        let mouseLook = { x: 0, y: 0 };
+        let isPointerLocked = false;
+        let lastShootTime = 0;
+        let lastPaintTime = 0; // Cooldown for painting camouflage
+
+        // Initialize 3D Engine
+        function init3DEngine() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0f172a);
+            scene.fog = new THREE.FogExp2(0x0f172a, 0.02);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            clock = new THREE.Clock();
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(20, 40, 20);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 1024;
+            dirLight.shadow.mapSize.height = 1024;
+            scene.add(dirLight);
+
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function generateMap(mapType, sizeType = gameState.mapSize) {
+            // Clear existing map
+            mapObjects.forEach(obj => scene.remove(obj));
+            mapObjects = [];
+
+            // Define dynamic map size bounds
+            let sizeLength = 50;
+            if (sizeType === 'small') sizeLength = 40;
+            else if (sizeType === 'medium') sizeLength = 70;
+            else if (sizeType === 'large') sizeLength = 100;
+
+            gameState.mapLimit = (sizeLength / 2) - 2;
+
+            let floorColor = 0xb8a876; // Yellowish Carpet for Backrooms
+            let gridColor1 = 0xeab308;
+            let gridColor2 = 0x854d0e;
+            let fogColor = 0x262310;
+            let lightColor = 0xfef08a;
+
+            if (mapType === 'iceland') {
+                floorColor = 0xdbeafe; // Snowy ice floor
+                gridColor1 = 0x38bdf8;
+                gridColor2 = 0x0284c7;
+                fogColor = 0x0f172a;
+                lightColor = 0xe0f2fe;
+            } else if (mapType === 'factory') {
+                floorColor = 0x1e293b; // Dark metal/concrete floor
+                gridColor1 = 0xef4444;
+                gridColor2 = 0x7f1d1d;
+                fogColor = 0x180c0c;
+                lightColor = 0xfca5a5;
+            }
+
+            scene.background = new THREE.Color(fogColor);
+            scene.fog = new THREE.FogExp2(fogColor, 0.015);
+
+            // Floor Mat
+            const floorMat = new THREE.MeshStandardMaterial({ color: floorColor, roughness: 0.7, metalness: mapType === 'factory' ? 0.3 : 0.1 });
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(sizeLength, sizeLength), floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            scene.add(floor);
+            mapObjects.push(floor);
+
+            // Visual Grid Helper on floor
+            const grid = new THREE.GridHelper(sizeLength, Math.floor(sizeLength / 2), gridColor1, gridColor2);
+            grid.position.y = 0.02;
+            scene.add(grid);
+            mapObjects.push(grid);
+
+            // Theme Specific Ambient Lights
+            const mapLight = new THREE.DirectionalLight(lightColor, 0.6);
+            mapLight.position.set(10, 30, 10);
+            scene.add(mapLight);
+            mapObjects.push(mapLight);
+
+            // Map-specific decorative structures
+            const numProps = sizeType === 'small' ? 8 : sizeType === 'medium' ? 14 : 20;
+            const limit = gameState.mapLimit * 0.8;
+
+            for (let i = 0; i < numProps; i++) {
+                const px = (Math.random() - 0.5) * limit * 2;
+                const pz = (Math.random() - 0.5) * limit * 2;
+                if (Math.abs(px) < 4 && Math.abs(pz) < 4) continue; // Keep center spawn clear
+
+                let propMesh;
+                if (mapType === 'backrooms') {
+                    // Backrooms iconic mono-yellow pillars
+                    const mat = new THREE.MeshStandardMaterial({ color: 0xd4c485, roughness: 0.9 });
+                    propMesh = new THREE.Mesh(new THREE.BoxGeometry(2, 4, 2), mat);
+                    propMesh.position.set(px, 2, pz);
+                } else if (mapType === 'iceland') {
+                    // Ice pillars / Ice crystals
+                    const mat = new THREE.MeshStandardMaterial({ color: 0xbae6fd, roughness: 0.1, metalness: 0.8, transparent: true, opacity: 0.85 });
+                    propMesh = new THREE.Mesh(new THREE.ConeGeometry(1.5, 4, 6), mat);
+                    propMesh.position.set(px, 2, pz);
+                } else if (mapType === 'factory') {
+                    // Industrial Metal Crates
+                    const mat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.4 });
+                    propMesh = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.5, 2.5), mat);
+                    propMesh.position.set(px, 1.25, pz);
+                }
+
+                if (propMesh) {
+                    propMesh.castShadow = true;
+                    propMesh.receiveShadow = true;
+                    scene.add(propMesh);
+                    mapObjects.push(propMesh);
+                }
+            }
+        }
+
+        function createCharacterMesh(isSeeker) {
+            const group = new THREE.Group();
+            
+            // Body
+            const bodyMat = new THREE.MeshStandardMaterial({
+                color: isSeeker ? 0xef4444 : 0x10b981,
+                roughness: 0.5
+            });
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 1.8, 12), bodyMat);
+            body.position.y = 0.9;
+            body.castShadow = true;
+            group.add(body);
+
+            // Head
+            const headMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc });
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12, 12), headMat);
+            head.position.y = 2.1;
+            head.castShadow = true;
+            group.add(head);
+
+            // Seeker Red Glowing Aura Tag
+            if (isSeeker) {
+                const auraMat = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+                const aura = new THREE.Mesh(new THREE.SphereGeometry(1.2, 8, 8), auraMat);
+                aura.position.y = 1.2;
+                group.add(aura);
+            }
+
+            // Simple Gun Model held in hand
+            const gunMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8 });
+            const gunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.8), gunMat);
+            gunMesh.position.set(0.5, 1.2, -0.4);
+            group.add(gunMesh);
+
+            return group;
+        }
+
+        // Paint Camouflage Mechanic: Changes player color to blend into environment walls or floor
+        function triggerPaintCamouflage() {
+            if (!gameState.inGame || !p1 || p1.isSeeker) return;
+            const now = clock.getElapsedTime();
+            if (now - lastPaintTime < 4.0) return; // 4s cooldown
+            lastPaintTime = now;
+
+            // Pick a camouflage color matching the map or random wall palette
+            let camoColors = [0xd4c485, 0xb8a876, 0x854d0e]; // Backrooms yellow tones
+            if (gameState.selectedMap === 'iceland') camoColors = [0xdbeafe, 0x38bdf8, 0xbae6fd];
+            if (gameState.selectedMap === 'factory') camoColors = [0x1e293b, 0x334155, 0x475569];
+
+            const chosenColor = camoColors[Math.floor(Math.random() * camoColors.length)];
+
+            // Apply camo color to player mesh body
+            const bodyMesh = p1.mesh.children[0];
+            if (bodyMesh && bodyMesh.material) {
+                bodyMesh.material.color.setHex(chosenColor);
+                bodyMesh.material.roughness = 0.2; // Glossy shiny camouflage effect
+            }
+
+            // Show temporary HUD notification
+            showCamouflageNotice("🎨 페인트 은장 위장 성공! 술래의 시야에 덜 띱니다!");
+            SoundFX.playTag();
+        }
+
+        function showCamouflageNotice(msg) {
+            let notice = document.getElementById('camo-notice');
+            if (!notice) {
+                notice = document.createElement('div');
+                notice.id = 'camo-notice';
+                notice.className = 'absolute top-24 left-1/2 -translate-x-1/2 bg-emerald-950/90 text-emerald-300 px-4 py-2 rounded-xl border border-emerald-600 text-sm font-bold shadow-2xl z-50 transition-opacity duration-300';
+                document.getElementById('game-hud').appendChild(notice);
+            }
+            notice.textContent = msg;
+            notice.style.opacity = '1';
+            setTimeout(() => {
+                notice.style.opacity = '0';
+            }, 3000);
+        }
+
+        function setupEntities() {
+            // Remove previous entities
+            entities.forEach(e => scene.remove(e.mesh));
+            entities = [];
+
+            // Determine if Player 1 is the Seeker (15% chance as specified)
+            const playerIsSeeker = Math.random() < gameState.isSeekerProbability;
+            gameState.myRole = playerIsSeeker ? 'seeker' : 'runner';
+
+            const totalCount = 16; // 1 seeker + 15 runners
+            let seekerAssigned = false;
+
+            for (let i = 0; i < totalCount; i++) {
+                const isPlayer = (i === 0);
+                let isSeeker = false;
+
+                if (isPlayer) {
+                    isSeeker = playerIsSeeker;
+                    if (isSeeker) seekerAssigned = true;
+                } else {
+                    if (!seekerAssigned && (i === totalCount - 1 || Math.random() < 0.2)) {
+                        isSeeker = true;
+                        seekerAssigned = true;
+                    }
+                }
+
+                // Random spawn position
+                const angle = (i / totalCount) * Math.PI * 2;
+                const dist = 4 + Math.random() * (gameState.mapLimit * 0.7);
+                const posX = Math.cos(angle) * dist;
+                const posZ = Math.sin(angle) * dist;
+
+                const mesh = createCharacterMesh(isSeeker);
+                mesh.position.set(posX, 0, posZ);
+                scene.add(mesh);
+
+                entities.push({
+                    id: i,
+                    isPlayer: isPlayer,
+                    isSeeker: isSeeker,
+                    mesh: mesh,
+                    velocity: new THREE.Vector3(),
+                    speed: isSeeker ? 11 : 9.5,
+                    targetPos: new THREE.Vector3(posX, 0, posZ),
+                    changeDirTime: 0,
+                    hp: 100
+                });
+            }
+
+            // Player 1 reference
+            p1 = entities[0];
+            
+            // Update HUD text
+            updateHUDStatus();
+        }
+
+        function updatePlayer(delta) {
+            if (!p1) return;
+
+            // Apply Move Speed Upgrades
+            const speedBonus = 1 + (gameState.upgrades.moveSpeedLvl - 1) * 0.05;
+            const currentSpeed = p1.speed * speedBonus;
+
+            const moveDir = new THREE.Vector3();
+            if (keyState['KeyW'] || keyState['ArrowUp']) moveDir.z -= 1;
+            if (keyState['KeyS'] || keyState['ArrowDown']) moveDir.z += 1;
+            if (keyState['KeyA'] || keyState['ArrowLeft']) moveDir.x -= 1;
+            if (keyState['KeyD'] || keyState['ArrowRight']) moveDir.x += 1;
+
+            moveDir.normalize();
+
+            // Rotate direction according to mouse look
+            const euler = new THREE.Euler(0, mouseLook.x, 0, 'YXZ');
+            moveDir.applyEuler(euler);
+
+            p1.mesh.position.addScaledVector(moveDir, currentSpeed * delta);
+
+            // Dynamic Map Boundary Constraints
+            const limit = gameState.mapLimit;
+            p1.mesh.position.x = Math.max(-limit, Math.min(limit, p1.mesh.position.x));
+            p1.mesh.position.z = Math.max(-limit, Math.min(limit, p1.mesh.position.z));
+
+            // Camera follow Player 1
+            camera.rotation.set(mouseLook.y, mouseLook.x, 0, 'YXZ');
+            const cameraOffset = new THREE.Vector3(0, 2.0, 0);
+            camera.position.copy(p1.mesh.position).add(cameraOffset);
+        }
+
+        function updateAI(delta) {
+            const now = clock.getElapsedTime();
+            const limit = gameState.mapLimit;
+
+            entities.forEach(ent => {
+                if (ent.isPlayer) return;
+
+                if (now > ent.changeDirTime) {
+                    ent.changeDirTime = now + 1.5 + Math.random() * 2.5;
+                    
+                    if (ent.isSeeker) {
+                        let nearestRunner = null;
+                        let minDist = Infinity;
+                        entities.forEach(other => {
+                            if (!other.isSeeker) {
+                                const d = ent.mesh.position.distanceTo(other.mesh.position);
+                                if (d < minDist) {
+                                    minDist = d;
+                                    nearestRunner = other;
+                                }
+                            }
+                        });
+                        if (nearestRunner) {
+                            ent.targetPos.copy(nearestRunner.mesh.position);
+                        }
+                    } else {
+                        let closestSeeker = null;
+                        let minDist = Infinity;
+                        entities.forEach(other => {
+                            if (other.isSeeker) {
+                                const d = ent.mesh.position.distanceTo(other.mesh.position);
+                                if (d < minDist) {
+                                    minDist = d;
+                                    closestSeeker = other;
+                                }
+                            }
+                        });
+
+                        if (closestSeeker && minDist < limit * 0.8) {
+                            const fleeDir = new THREE.Vector3()
+                                .subVectors(ent.mesh.position, closestSeeker.mesh.position)
+                                .normalize();
+                            ent.targetPos.copy(ent.mesh.position).addScaledVector(fleeDir, limit * 0.6);
+                        } else {
+                            ent.targetPos.set(
+                                (Math.random() - 0.5) * limit * 1.8,
+                                0,
+                                (Math.random() - 0.5) * limit * 1.8
+                            );
+                        }
+                    }
+                }
+
+                const dir = new THREE.Vector3().subVectors(ent.targetPos, ent.mesh.position);
+                dir.y = 0;
+                if (dir.length() > 0.5) {
+                    dir.normalize();
+                    ent.mesh.position.addScaledVector(dir, ent.speed * delta);
+                    ent.mesh.lookAt(ent.mesh.position.x + dir.x, ent.mesh.position.y, ent.mesh.position.z + dir.z);
+                }
+
+                // Dynamic boundary clamp
+                ent.mesh.position.x = Math.max(-limit, Math.min(limit, ent.mesh.position.x));
+                ent.mesh.position.z = Math.max(-limit, Math.min(limit, ent.mesh.position.z));
+            });
+        }
+
+        function updateBullets(delta) {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const b = bullets[i];
+                b.life -= delta;
+                b.mesh.position.addScaledVector(b.dir, b.speed * delta);
+
+                // Collision with entities
+                entities.forEach(ent => {
+                    if (ent !== b.owner && !ent.isSeeker) {
+                        const dist = b.mesh.position.distanceTo(ent.mesh.position.clone().add(new THREE.Vector3(0, 1, 0)));
+                        if (dist < 1.2) {
+                            // Bullet Hit! Convert Runner into Seeker (Tag)
+                            turnIntoSeeker(ent);
+                            if (b.owner.isPlayer) {
+                                gameState.playerDamageDealt += Math.round(b.damage);
+                                gameState.playerCoinsEarned += 30;
+                                SoundFX.playTag();
+                            }
+                            b.life = 0; // Destroy bullet
+                        }
+                    }
+                });
+
+                // Remove expired bullets
+                if (b.life <= 0) {
+                    scene.remove(b.mesh);
+                    bullets.splice(i, 1);
+                }
+            }
+        }
+
+        function checkTagCollisions() {
+            const seekers = entities.filter(e => e.isSeeker);
+            const runners = entities.filter(e => !e.isSeeker);
+
+            seekers.forEach(seeker => {
+                runners.forEach(runner => {
+                    const dist = seeker.mesh.position.distanceTo(runner.mesh.position);
+                    if (dist < 1.5) {
+                        // Tagged by physical touch!
+                        turnIntoSeeker(runner);
+                        if (seeker.isPlayer) {
+                            gameState.playerTaggedCount++;
+                            gameState.playerCoinsEarned += 100;
+                        }
+                        SoundFX.playTag();
+                    }
+                });
+            });
+
+            // Check Win/Loss Condition
+            if (runners.length === 0) {
+                // All runners converted to seekers!
+                endGame(p1.isSeeker ? 'victory' : 'defeat', '모든 숨는 사람이 술래에게 잡혔습니다!');
+            }
+        }
+
+        function turnIntoSeeker(entity) {
+            if (entity.isSeeker) return;
+            entity.isSeeker = true;
+            entity.speed = 11;
+
+            // Re-create mesh with glowing red seeker aura
+            scene.remove(entity.mesh);
+            entity.mesh = createCharacterMesh(true);
+            scene.add(entity.mesh);
+
+            if (entity.isPlayer) {
+                gameState.myRole = 'seeker';
+            }
+
+            updateHUDStatus();
+        }
+
+        function updateHUDStatus() {
+            const runners = entities.filter(e => !e.isSeeker).length;
+            const seekers = entities.filter(e => e.isSeeker).length;
+
+            document.getElementById('hud-runners-count').textContent = runners;
+            document.getElementById('hud-seekers-count').textContent = seekers;
+
+            const badge = document.getElementById('hud-role-badge');
+            if (p1 && p1.isSeeker) {
+                badge.textContent = '술래 (Seeker)';
+                badge.className = 'px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-rose-950 text-rose-400 border border-rose-800 inline-block';
+            } else {
+                badge.textContent = '숨는 사람 (Runner)';
+                badge.className = 'px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-emerald-950 text-emerald-400 border border-emerald-800 inline-block';
+            }
+
+            document.getElementById('hud-coins').textContent = gameState.playerCoinsEarned;
+        }
+
+        function startGame() {
+            SoundFX.init();
+            gameState.inGame = true;
+            gameState.timeRemaining = 300; // 5 min
+            gameState.playerCoinsEarned = 0;
+            gameState.playerDamageDealt = 0;
+            gameState.playerTaggedCount = 0;
+
+            // UI toggles
+            document.getElementById('lobby-screen').classList.add('hidden');
+            document.getElementById('game-hud').classList.remove('hidden');
+
+            // Generate map & entities
+            generateMap(gameState.selectedMap);
+            setupEntities();
+
+            // Request Pointer Lock for controls
+            document.getElementById('canvas-container').requestPointerLock();
+        }
+
+        function endGame(result, reason) {
+            gameState.inGame = false;
+            document.exitPointerLock();
+
+            // Award coins back to persistent total
+            const bonusCoins = result === 'victory' ? 250 : 80;
+            const totalEarned = gameState.playerCoinsEarned + bonusCoins;
+            gameState.coins += totalEarned;
+
+            // Update Result Modal
+            const modal = document.getElementById('result-modal');
+            const title = document.getElementById('result-title');
+            const desc = document.getElementById('result-desc');
+            const icon = document.getElementById('result-icon');
+
+            if (result === 'victory') {
+                SoundFX.playWin();
+                title.textContent = '게임 승리!';
+                title.className = 'text-3xl font-black text-emerald-400 mb-2';
+                icon.className = 'text-6xl mb-4 text-emerald-400';
+                icon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+            } else {
+                title.textContent = '게임 패배!';
+                title.className = 'text-3xl font-black text-rose-500 mb-2';
+                icon.className = 'text-6xl mb-4 text-rose-500';
+                icon.innerHTML = '<i class="fa-solid fa-skull"></i>';
+            }
+
+            desc.textContent = `${reason}`;
+            document.getElementById('res-stat-tagged').textContent = `${gameState.playerTaggedCount} 명`;
+            document.getElementById('res-stat-damage').textContent = `${gameState.playerDamageDealt}`;
+            document.getElementById('res-stat-coins').textContent = `+${totalEarned} G`;
+
+            modal.classList.remove('hidden');
+            document.getElementById('lobby-coins').textContent = gameState.coins;
+        }
+
+        function spinGachaRoulette() {
+            if (gameState.coins < 100) {
+                alert('코인이 부족합니다! (100 G 필요)');
+                return;
+            }
+            gameState.coins -= 100;
+            document.getElementById('lobby-coins').textContent = gameState.coins;
+
+            const modal = document.getElementById('gacha-modal');
+            const strip = document.getElementById('roulette-strip');
+            const resBox = document.getElementById('gacha-result');
+
+            modal.classList.remove('hidden');
+            resBox.classList.add('hidden');
+
+            // Determine Result Item based on Weighted Probability Table
+            // Odds: Common 30%, Rare 20%, Epic 15%, Legendary 10%, Mythic 7%, Secret 5%, Impossible 3% (Total = 90 weight)
+            const rnd = Math.random() * 90;
+            let cumulative = 0;
+            let wonGunIndex = 0;
+
+            for (let i = 0; i < GUNS_DATABASE.length; i++) {
+                cumulative += GUNS_DATABASE[i].chance;
+                if (rnd <= cumulative) {
+                    wonGunIndex = i;
+                    break;
+                }
+            }
+
+            // Build Roulette Visual Strip (30 Random Cards + Final Result Card)
+            strip.innerHTML = '';
+            const totalCards = 30;
+            const targetIndex = 25; // Index where the winning item lands
+
+            for (let i = 0; i < totalCards; i++) {
+                const gun = (i === targetIndex) ? GUNS_DATABASE[wonGunIndex] : GUNS_DATABASE[Math.floor(Math.random() * GUNS_DATABASE.length)];
+                
+                const card = document.createElement('div');
+                card.className = `w-40 h-24 rounded-xl border-2 flex flex-col items-center justify-center p-2 bg-slate-950 shrink-0 shadow-lg`;
+                card.style.borderColor = gun.color;
+                card.innerHTML = `
+                    <div class="text-xs font-bold" style="color:${gun.color}">${gun.rarity}</div>
+                    <div class="text-sm font-extrabold text-slate-100 text-center truncate w-full">${gun.name}</div>
+                    <div class="text-[10px] text-slate-400 mt-1">확률: ${gun.chance}%</div>
+                `;
+                strip.appendChild(card);
+            }
+
+            // Animate Scrolling Effect
+            const cardWidth = 160 + 16; // width + gap
+            const targetX = -(targetIndex * cardWidth) + (cardWidth / 2);
+            strip.style.transition = 'none';
+            strip.style.transform = 'translateX(0px)';
+
+            setTimeout(() => {
+                strip.style.transition = 'transform 3.5s cubic-bezier(0.15, 0.9, 0.25, 1)';
+                strip.style.transform = `translateX(${targetX}px)`;
+            }, 50);
+
+            // Show Result UI after animation finishes
+            setTimeout(() => {
+                const wonGun = GUNS_DATABASE[wonGunIndex];
+                gameState.equippedGunIndex = wonGunIndex;
+
+                document.getElementById('gacha-res-name').textContent = wonGun.name;
+                document.getElementById('gacha-res-name').style.color = wonGun.color;
+                document.getElementById('gacha-res-rarity').textContent = `등급: ${wonGun.rarity} (${wonGun.chance}%)`;
+                document.getElementById('gacha-res-rarity').style.color = wonGun.color;
+
+                resBox.classList.remove('hidden');
+                updateEquippedGunUI();
+            }, 3600);
+        }
+
+        function updateEquippedGunUI() {
+            const gun = GUNS_DATABASE[gameState.equippedGunIndex];
+            document.getElementById('equipped-gun-name').textContent = gun.name;
+            document.getElementById('equipped-gun-rarity').textContent = `${gun.rarity} (${gun.chance}%)`;
+            document.getElementById('equipped-gun-rarity').style.color = gun.color;
+
+            document.getElementById('gun-stat-firerate').textContent = `${gun.fireRate}초`;
+            document.getElementById('gun-stat-damage').textContent = `${gun.damage}`;
+
+            document.getElementById('hud-gun-name').textContent = gun.name;
+            document.getElementById('hud-gun-rarity').textContent = `${gun.rarity}`;
+            document.getElementById('hud-gun-rarity').style.color = gun.color;
+        }
+
+        function setupUpgradeButtons() {
+            const upgradeCosts = { damage: 150, firerate: 150, movespeed: 150 };
+
+            document.getElementById('btn-up-damage').addEventListener('click', () => {
+                if (gameState.coins >= upgradeCosts.damage) {
+                    gameState.coins -= upgradeCosts.damage;
+                    gameState.upgrades.damageLvl++;
+                    upgradeCosts.damage = Math.round(upgradeCosts.damage * 1.5);
+                    document.getElementById('lvl-damage').textContent = gameState.upgrades.damageLvl;
+                    document.getElementById('cost-damage').textContent = upgradeCosts.damage;
+                    document.getElementById('lobby-coins').textContent = gameState.coins;
+                } else alert('코인이 부족합니다!');
+            });
+
+            document.getElementById('btn-up-firerate').addEventListener('click', () => {
+                if (gameState.coins >= upgradeCosts.firerate) {
+                    gameState.coins -= upgradeCosts.firerate;
+                    gameState.upgrades.fireRateLvl++;
+                    upgradeCosts.firerate = Math.round(upgradeCosts.firerate * 1.5);
+                    document.getElementById('lvl-firerate').textContent = gameState.upgrades.fireRateLvl;
+                    document.getElementById('cost-firerate').textContent = upgradeCosts.firerate;
+                    document.getElementById('lobby-coins').textContent = gameState.coins;
+                } else alert('코인이 부족합니다!');
+            });
+
+            document.getElementById('btn-up-movespeed').addEventListener('click', () => {
+                if (gameState.coins >= upgradeCosts.movespeed) {
+                    gameState.coins -= upgradeCosts.movespeed;
+                    gameState.upgrades.moveSpeedLvl++;
+                    upgradeCosts.movespeed = Math.round(upgradeCosts.movespeed * 1.5);
+                    document.getElementById('lvl-movespeed').textContent = gameState.upgrades.moveSpeedLvl;
+                    document.getElementById('cost-movespeed').textContent = upgradeCosts.movespeed;
+                    document.getElementById('lobby-coins').textContent = gameState.coins;
+                } else alert('코인이 부족합니다!');
+            });
+        }
+
+        function setupControls() {
+            window.addEventListener('keydown', (e) => {
+                keyState[e.code] = true;
+
+                // Press 'E' to trigger Paint Camouflage Hide
+                if (e.code === 'KeyE') {
+                    triggerPaintCamouflage();
+                }
+            });
+
+            window.addEventListener('keyup', (e) => {
+                keyState[e.code] = false;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!gameState.inGame) return;
+                if (document.pointerLockElement === document.getElementById('canvas-container') || document.pointerLockElement === document.body) {
+                    const sensitivity = 0.002;
+                    mouseLook.x -= e.movementX * sensitivity;
+                    mouseLook.y -= e.movementY * sensitivity;
+
+                    // Clamp pitch (look up / down limits)
+                    const maxPitch = Math.PI / 2.2;
+                    mouseLook.y = Math.max(-maxPitch, Math.min(maxPitch, mouseLook.y));
+                }
+            });
+
+            document.addEventListener('pointerlockchange', () => {
+                isPointerLocked = (document.pointerLockElement === document.getElementById('canvas-container') || document.pointerLockElement === document.body);
+            });
+
+            // Shoot weapon on click
+            window.addEventListener('mousedown', (e) => {
+                if (gameState.inGame && e.button === 0) {
+                    shootWeapon();
+                }
+            });
+        }
+
+        function shootWeapon() {
+            if (!gameState.inGame || !p1) return;
+            const now = clock.getElapsedTime();
+            const gun = GUNS_DATABASE[gameState.equippedGunIndex];
+            
+            // Apply Fire Rate upgrades (decreases cooldown)
+            const fireRateReduction = (gameState.upgrades.fireRateLvl - 1) * 0.08;
+            const effectiveCooldown = Math.max(0.02, gun.fireRate * (1 - fireRateReduction));
+
+            if (now - lastShootTime < effectiveCooldown) return;
+            lastShootTime = now;
+
+            SoundFX.playShoot();
+
+            // Damage multiplier from upgrades
+            const damageMultiplier = 1 + (gameState.upgrades.damageLvl - 1) * 0.10;
+            const finalDamage = gun.damage * damageMultiplier;
+
+            // Create bullet mesh
+            const bulletGeo = new THREE.SphereGeometry(0.15, 8, 8);
+            const bulletMat = new THREE.MeshBasicMaterial({ color: gun.bulletColor || 0xffff00 });
+            const bulletMesh = new THREE.Mesh(bulletGeo, bulletMat);
+
+            // Position at player camera eyes
+            const spawnPos = p1.mesh.position.clone().add(new THREE.Vector3(0, 1.5, 0));
+            bulletMesh.position.copy(spawnPos);
+
+            // Compute shot direction based on camera rotation
+            const shootDir = new THREE.Vector3(0, 0, -1);
+            const euler = new THREE.Euler(mouseLook.y, mouseLook.x, 0, 'YXZ');
+            shootDir.applyEuler(euler).normalize();
+
+            scene.add(bulletMesh);
+
+            bullets.push({
+                mesh: bulletMesh,
+                dir: shootDir,
+                speed: 40 * (gun.speed || 1.0),
+                damage: finalDamage,
+                life: 2.5,
+                owner: p1
+            });
+        }
+
+        let timerAccumulator = 0;
+
+        function gameLoop() {
+            requestAnimationFrame(gameLoop);
+
+            const delta = clock.getDelta();
+
+            if (gameState.inGame) {
+                // Timer countdown
+                timerAccumulator += delta;
+                if (timerAccumulator >= 1.0) {
+                    timerAccumulator -= 1.0;
+                    gameState.timeRemaining--;
+
+                    const mins = Math.floor(gameState.timeRemaining / 60);
+                    const secs = gameState.timeRemaining % 60;
+                    const timerStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                    document.getElementById('hud-timer').textContent = timerStr;
+
+                    if (gameState.timeRemaining <= 0) {
+                        if (!p1.isSeeker) {
+                            endGame('victory', '5분 동안 제한시간 안에서 무사히 살아남았습니다!');
+                        } else {
+                            endGame('defeat', '제한시간 내에 모든 숨는 사람을 잡지 못했습니다.');
+                        }
+                    }
+                }
+
+                updatePlayer(delta);
+                updateAI(delta);
+                updateBullets(delta);
+                checkTagCollisions();
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.onload = function() {
+            init3DEngine();
+            setupControls();
+            setupUpgradeButtons();
+            updateEquippedGunUI();
+
+            // Map Size Buttons
+            const sizeBtns = document.querySelectorAll('.size-btn');
+            sizeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    sizeBtns.forEach(b => {
+                        b.className = 'size-btn py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700';
+                    });
+                    const target = e.currentTarget;
+                    target.className = 'size-btn py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs border border-indigo-400 shadow';
+                    
+                    if (target.id === 'size-small') gameState.mapSize = 'small';
+                    if (target.id === 'size-medium') gameState.mapSize = 'medium';
+                    if (target.id === 'size-large') gameState.mapSize = 'large';
+                });
+            });
+
+            // Map selection buttons
+            const mapBtns = document.querySelectorAll('.map-btn');
+            mapBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    mapBtns.forEach(b => {
+                        b.className = 'map-btn p-2 rounded-xl border border-slate-700 bg-slate-950/40 text-slate-400 font-bold text-xs flex flex-col items-center gap-1 transition';
+                    });
+                    const target = e.currentTarget;
+                    target.className = 'map-btn p-2 rounded-xl border border-amber-500 bg-amber-950/40 text-amber-300 font-bold text-xs flex flex-col items-center gap-1 transition';
+                    
+                    if (target.id === 'map-backrooms') gameState.selectedMap = 'backrooms';
+                    if (target.id === 'map-iceland') gameState.selectedMap = 'iceland';
+                    if (target.id === 'map-factory') gameState.selectedMap = 'factory';
+
+                    const names = { backrooms: '백룸 (Backrooms)', iceland: '아이스랜드 (Iceland)', factory: '팩토리 (Factory)' };
+                    document.getElementById('hud-map-name').textContent = names[gameState.selectedMap];
+                });
+            });
+
+            // Mode buttons
+            document.getElementById('mode-1p').addEventListener('click', () => {
+                gameState.mode = '1p';
+                document.getElementById('mode-1p').className = 'py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs border border-indigo-400 shadow';
+                document.getElementById('mode-2p').className = 'py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700';
+            });
+            document.getElementById('mode-2p').addEventListener('click', () => {
+                gameState.mode = '2p';
+                document.getElementById('mode-2p').className = 'py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs border border-indigo-400 shadow';
+                document.getElementById('mode-1p').className = 'py-2 bg-slate-800 text-slate-400 font-bold rounded-lg text-xs border border-slate-700';
+            });
+
+            // Gacha Spin Button
+            document.getElementById('btn-spin-gacha').addEventListener('click', spinGachaRoulette);
+            document.getElementById('btn-close-gacha').addEventListener('click', () => {
+                document.getElementById('gacha-modal').classList.add('hidden');
+            });
+
+            // Start Game Button
+            document.getElementById('btn-start-game').addEventListener('click', startGame);
+
+            // Return to Lobby Button
+            document.getElementById('btn-return-lobby').addEventListener('click', () => {
+                document.getElementById('result-modal').classList.add('hidden');
+                document.getElementById('game-hud').classList.add('hidden');
+                document.getElementById('lobby-screen').classList.remove('hidden');
+            });
+
+            // Start Render Animation Loop
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
